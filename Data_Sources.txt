@@ -1,0 +1,49 @@
+
+#-------------------------------------------------------------------------#
+#---------------	 General information			   -------#
+#-------------------------------------------------------------------------#
+
+'GW_Data.csv' corresponds to the data set with the predictors in Goyal and Welch (2008) only. 
+'GWP_Data.csv' also includes the predictor proposed by Pyun (2019). 
+'MacroData_INDPRO_prepared.csv' corresponds to the prepared macroeconomic data set.
+
+
+#-------------------------------------------------------------------------#
+#--------------- Data sources for predicting the US equity premium -------#
+#-------------------------------------------------------------------------#
+
+The data by Welch and Goyal (2008) can be found here:
+https://sites.google.com/view/agoyal145
+
+We consider twelve features:
+book-to-market ratio 		(bmr)
+default return spread  		(dfr)
+default yield spread   		(dfy)
+dividend payout ratio  		(dpayr)
+dividend yield 	   		(dy)
+earnings-price-ratio  		(ep) 
+inflation 			(inf) 
+return on long-term government  (ltr) 
+long-term government bond yield (lty) 
+net equity expansion 		(ntis) 
+stock variance 			(svar) 
+treasury bill rate 		(tbl) 
+
+The forecasts by Pyun (2019), abbreviated as vrp, can be found here:
+https://sjpyun.github.io/research.html
+
+#---------------------------------------------------------------------------#
+#- Data sources for predicting the growth rate of US industrial production -#
+#---------------------------------------------------------------------------#
+
+The data by McCracken and Ng (2016) and the Matlab code for pre-processing the data can be found here:
+https://research.stlouisfed.org/econ/mccracken/fred-databases/
+
+
+
+
+
+
+
+
+
