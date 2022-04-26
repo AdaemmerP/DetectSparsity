@@ -19,6 +19,8 @@ R packages |
 `tidyr` |
 `stringr`|
 `scales` | 
+`lemon` | 
+`forcats` | 
 
 ## Case Studies 
 'Readme_CaseStudies.txt' explains how to initialize the environment in Julia and how to use the codes to replicate the results of the paper. 
