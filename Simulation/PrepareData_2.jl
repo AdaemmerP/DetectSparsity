@@ -1,6 +1,6 @@
 """
 This script loads the necessary packages, sets up the workers and prepares 
-the data as well as pre-allocates the matrices for the main simulation
+the data as well as pre-allocates for Figure 5
 """
 
 # Activate environment
@@ -120,11 +120,11 @@ if dataset == 0
   τ0  = Int64(60)
   n   = q0 + τ0 + 1                  		 
   if dataset == 0
-    ω  	= [1.0; 3.0; 5.0; 8.0; 10.0; 15.0; 20.0] 
+    ω  	= [10.0; 8.0; 5.0] 
   elseif dataset == 1
-    ω  	= [1.0; 1.5; 2.0; 2.5; 3.0; 3.5; 4.0] 
+    ω  	= [2.0; 1.5; 1.0] 
   end
-  α        = [0.0; 0.5;  1.0]		        
+  α        = [0.5;  1.0]		        
   ζ        = [0.0, 0.25, 0.5, 0.75, 1.0]          
 
   if dataset == 0 
@@ -153,50 +153,33 @@ if dataset == 0
   comb_t = (collect(Iterators.product(1:moos_total, model_comb)))
 	
 # Pre-allocate for forecast combinations
-  fccomb_flex_mse = zeros(length(nz_β), length(ω));
-  fccomb_ew_mse   = zeros(length(nz_β), length(ω));			
-  fccomb_flex_nr  = zeros(length(nz_β), length(ω));
+  fccomb_flex_nr              = DataFrame(zeros(N, length(ω)), :auto);
+  rename!(fccomb_flex_nr, ["nb_5"; "nb_50"; "nb_100"])
+  fccomb_flex_nr[!, :Method] .= "FC-Flex"
 
 # Pre-allocate for glmnets  
-  ridge_mse 	     = zeros(length(nz_β), length(ω));
-  enet_mse         = zeros(length(nz_β), length(ω));
-  lasso_mse	       = zeros(length(nz_β), length(ω));
-  lasso_relax_mse  = zeros(length(nz_β), length(ω));
-  lasso_adapt_mse  = zeros(length(nz_β), length(ω));
+  enet_nr               = DataFrame(zeros(N, length(ω)), :auto);
+  rename!(enet_nr, ["nb_5"; "nb_50"; "nb_100"])
+  enet_nr[!, :Method]  .= "Elastic Net" 
 
-  enet_nr          = zeros(length(nz_β), length(ω)); 
-  lasso_nr         = zeros(length(nz_β), length(ω));
-  lasso_relax_nr   = zeros(length(nz_β), length(ω));
-  lasso_adapt_nr   = zeros(length(nz_β), length(ω));
+  lasso_nr              = DataFrame(zeros(N, length(ω)), :auto);
+  rename!(lasso_nr, ["nb_5"; "nb_50"; "nb_100"])
+  lasso_nr[!, :Method] .= "Lasso"
+
+  lasso_relax_nr    = DataFrame(zeros(N, length(ω)), :auto);
+  rename!(lasso_relax_nr, ["nb_5"; "nb_50"; "nb_100"])
+  lasso_relax_nr[!, :Method] .= "Relaxed Lasso"
+# lasso_adapt_nr   = zeros(length(nz_β), length(ω));
 
 # Pre-allocate for Bayesian FSS
-  glp_mse = zeros(length(nz_β), length(ω));
-  glp_nr  = zeros(length(nz_β), length(ω));
+  glp_nr  = DataFrame(zeros(N, length(ω)), :auto);
+  rename!(glp_nr, ["nb_5"; "nb_50"; "nb_100"])
+  glp_nr[!, :Method] .= "BFSS"
 
 # Pre-allocate for BKM
-  bss_mse  = zeros(length(nz_β), length(ω)); 
-  bss_nr   = zeros(length(nz_β), length(ω));
-
-# Pre-allocate for shrunk results
-  fccomb_flex_mse_shrunk  = zeros(length(nz_β), length(ω));
-  fccomb_ew_mse_shrunk    = zeros(length(nz_β), length(ω));
-  ridge_mse_shrunk 	      = zeros(length(nz_β), length(ω));
-  enet_mse_shrunk         = zeros(length(nz_β), length(ω));
-  lasso_mse_shrunk	      = zeros(length(nz_β), length(ω));
-  lasso_relax_mse_shrunk  = zeros(length(nz_β), length(ω));
-  lasso_adapt_mse_shrunk  = zeros(length(nz_β), length(ω));
-  glp_mse_shrunk          = zeros(length(nz_β), length(ω));
-  bss_mse_shrunk          = zeros(length(nz_β), length(ω)); 
-
-# Pre-allocate for true positives
-  fccomb_tp      = zeros(length(nz_β), length(ω));
-  enet_tp        = zeros(length(nz_β), length(ω));
-  lasso_tp       = zeros(length(nz_β), length(ω));
-  lasso_relax_tp = zeros(length(nz_β), length(ω));
-  lasso_adapt_tp = zeros(length(nz_β), length(ω));
-  glp_tp         = zeros(length(nz_β), length(ω));
-  bss_tp         = zeros(length(nz_β), length(ω));
-
+  bss_nr   =  DataFrame(zeros(N, length(ω)), :auto);
+  rename!(bss_nr, ["nb_5"; "nb_50"; "nb_100"])
+  bss_nr[!, :Method] .= "BSS"
 
     
 

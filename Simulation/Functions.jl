@@ -153,11 +153,11 @@ function fcomb_simul(xy_mat, sample_train,
 
     # Return squared errors and length of chosen parameters
       return 	[ϵ_sq[end, index_pick]; 
-                ϵ_sq[end, ew_index];
-                length(model_comb[index_pick]); 
-                ϵ_sq_shrunk[end, index_pick];           
-                ϵ_sq_shrunk[end, ew_index];
-                truep] 
+               ϵ_sq[end, ew_index];
+               length(model_comb[index_pick]); 
+               ϵ_sq_shrunk[end, index_pick];           
+               ϵ_sq_shrunk[end, ew_index];
+               truep] 
 	end
 
 # -------------------------------------------------------------------------	
@@ -547,12 +547,15 @@ end
     yhat::Float64 = dot([1; xtest], [β0; βhat]) 
     yhat_shrunk   = (yhat + mean(ytrain))/2
 
-  # Return prediction (first entry) and average inclusion of each preditor 
+  # Average inclusion of preditors per Gibbs iteration
     z_run::Float64 = mean(map(i -> sum(i), eachcol(results_temp[2][:, (N + 1):end])))
 
   # Get active predictors and compute true positive rate
     pred_pick::Vector{Vector{Int64}} = map(i -> collect(1:length(βhat))[Bool.(i)], eachcol(results_temp[2][:, (N + 1):end]))  
     truep::Float64 = mean(length.(map(i -> intersect(i, β_active), pred_pick))./length(β_active)) # 
+
+  # Compute average q  
+  #  mean_q::Float64 = mean(results_temp[4][(N + 1):end])*length(βhat)
     
   return [(yhat - ytest)^2; (yhat_shrunk - ytest)^2; z_run; truep] 
 

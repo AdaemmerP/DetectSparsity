@@ -25,10 +25,10 @@
   using Distributed
 
 # Set data path 
-  data_path = string("")
+  data_path = ""
 
 # Set path to save results (only necessary when 'save_results = true')
-  save_path    = string("") 
+  save_path    = "" 
   save_results = false  # Save results?
 
 # Set number of cores for OpenBlas

@@ -170,7 +170,7 @@ for jj = 1:length(ω)
   # Compute models
     bkm_results_all  = pmap(kk -> bkm_predict(kk[1], train_seq, obs_test, kk[2]), eachrow(xydata_βact)) 
 
-  # Save results for weak predictors: (i) AIC, (ii) BIC and (iii) EBIC	
+  # Save results 
     bss_mse[ii, jj]        = 1 - mean(getindex.(bkm_results_all, 1))/MSE_hmean		   
     bss_nr[ii, jj]         = mean(getindex.(bkm_results_all, 2))
     bss_mse_shrunk[ii, jj] = 1 - mean(getindex.(bkm_results_all, 3))/MSE_hmean		
