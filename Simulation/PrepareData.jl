@@ -81,6 +81,30 @@ if dataset == 0
     # Remove 'Covid sample'    
       Xall     = filter(row -> row.date <= Date("2019-12-01"), Xall)
 
+  elseif dataset == 2
+
+    coltypes    = Any[Float64 for i= 1:117] 
+    coltypes[1] = String
+    Xall        = CSV.read(string(data_path, "MacroData_INDPRO_prepared.csv"),
+                            types = coltypes, DataFrame) 
+    Xall.date   = Date.(Xall.date, "yyyy-mm-dd")   
+    
+    lags_indpro_df  = DataFrame(map(i -> lag(Xall[:, :INDPRO], i), 0:3),  :auto)
+    rename!(lags_indpro_df,   map(i -> string("INDPRO_lag_", "$i"), 1:4))
+  
+   # Make DataFrame with lags
+    Xall = hcat(Xall[:, 1:3], lags_indpro_df, Xall[:, 4:end])
+    Xall = Xall[5:end, :] # Remove empty (lag) months
+  
+  # Compute correlation Matrix until 12-1969 
+    corx       = cor(Matrix(Xall[1:findfirst(i -> i == Date("1969-11-01"), Xall.date), Not(:date)]))
+    corx       = abs.(UpperTriangular(corx) - I(size(corx, 2)))
+    removecols = unique(getindex.(findall(i -> i .>= 0.95, corx), 2))  .+ 1 # Add one because :date is first column in DataFrame 
+    Xall       = Xall[:, Not(removecols[2:end])] # Start at second position because INDPRO and INPRO_lag are identical
+
+     # Remove 'Covid sample'    
+     Xall     = filter(row -> row.date <= Date("2019-12-01"), Xall)
+
  end
 
 #-----------------------------------------------------------------------------------------------------#
@@ -105,6 +129,11 @@ if dataset == 0
 # Covariance matrix of residuals for predictors
   Σ_x = cov((x_mat - ϕx'.*lag(x_mat))[2:end, :]) 
 
+# If dataset == 2 use
+  if diag_cov == 1 
+    Σ_x = diag(Σ_x).*I(size(Σ_x, 1))
+  end
+
 # Estimate degrees of freedom 
   @rput y_GWP      
   R"""
@@ -119,7 +148,7 @@ if dataset == 0
   q0  = Int64(140)  
   τ0  = Int64(60)
   n   = q0 + τ0 + 1                  		 
-  if dataset == 0
+  if dataset == 0 || dataset == 2
     ω  	= [1.0; 3.0; 5.0; 8.0; 10.0; 15.0; 20.0] 
   elseif dataset == 1
     ω  	= [1.0; 1.5; 2.0; 2.5; 3.0; 3.5; 4.0] 
@@ -129,7 +158,7 @@ if dataset == 0
 
   if dataset == 0 
 	  nz_β     = [3; 6; 13]  
-  elseif dataset == 1 
+  elseif dataset == 1  || dataset == 2
     nz_β     = [5; 50; 100]
   end
 
@@ -144,7 +173,7 @@ if dataset == 0
 
   if dataset == 0
 	  model_comb   = collect(combinations(1:(last(nr_preds) + 1))) # ('+1' because intercept only will be added)
-  elseif dataset == 1
+  elseif dataset == 1 || dataset == 2
     model_comb   = reduce(vcat, map(ii -> collect(combinations(1:(size(x_mat, 2) + 1), ii)), (1:3)))
     model_comb   = vcat(model_comb, [collect(2:(size(x_mat, 2) + 1))])
   end

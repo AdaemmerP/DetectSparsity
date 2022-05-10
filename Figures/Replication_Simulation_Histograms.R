@@ -7,7 +7,7 @@
   data_path <- ""
 
 # Load data
-  load(paste0(data_path,"Sim_Histograms/Sim_df_indiv.RData"))
+  load(paste0(data_path,"Sim_Histograms/Results_Figure5_Simulation_Macro.RData"))
 
   results_all <- results_all |>
                    mutate(Method = str_replace(Method, "Rel._lasso", "Relaxed~Lasso"))
@@ -20,9 +20,9 @@
 # Tidy data set
   results_all_tidy <- pivot_longer(results_all, !Method) |>
                         mutate(name   = fct_relevel(name,"nb_5", "nb_50", "nb_100")) |>
-                        mutate(name   = fct_recode(name, "n[beta]~'='~5"   = "nb_5",
-                                                       "n[beta]~'='~50"  = "nb_50",
-                                                       "n[beta]~'='~100" = "nb_100")) |>
+                        mutate(name   = fct_recode(name, "n[beta]~'='~5" = "nb_5",
+                                                         "n[beta]~'='~50"  = "nb_50",
+                                                         "n[beta]~'='~100" = "nb_100")) |>
                         mutate(Method = fct_relevel(Method, "FC-Flex", "BSS", 
                                                             "Relaxed~Lasso", "Lasso")) |>
                         mutate(Method = fct_recode(Method, "Elastic~Net" = "E-Net",

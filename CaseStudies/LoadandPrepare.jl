@@ -97,7 +97,7 @@
       rename!(lags_indpro_df,   map(i -> string("INDPRO_lag_", "$i"), 1:4))
       Xall = hcat(Xall[:, 1:3], lags_indpro_df, Xall[:, 4:end])
       Xall = Xall[:, r"date|INDPRO"]
-      Xall = Xall[5:end, :] # Remove empty (lag) months     
+      Xall = Xall[5:end, :] # Remove missing (lag) months     
     
     # Remove 'Covid sample' 
       if covid_out == true

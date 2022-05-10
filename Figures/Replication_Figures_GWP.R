@@ -6,7 +6,7 @@
   library(stringr)
 
 #--------------------- Plots for weak predictors (nrs) ------------------------#
-# Set data path here
+# Set data path here to "Results"
   data_path <- ""
   
 # Make plots

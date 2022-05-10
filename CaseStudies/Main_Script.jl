@@ -58,7 +58,7 @@
   include("Compile_functions.jl")
 
 # Choose dataset
-  dataset = 5 # 1: y = US excess stock returns,         x = Goyal Welch predictors  
+  dataset = 4 # 1: y = US excess stock returns,         x = Goyal Welch predictors  
               # 2: y = US excess stock returns,         x = Goyal Welch and Pyun predictor
               # 3: y = US industrial production growth, x = macroeconomic variables
               # 4: y = US industrial production growth, x = macroeconomic variables (including up to 4 lags of INDPRO)

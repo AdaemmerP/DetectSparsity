@@ -1,6 +1,6 @@
 """
 This script loads the necessary packages, sets up the workers and prepares 
-the data as well as pre-allocates for Figure 5
+the data for Figure 5
 """
 
 # Activate environment

@@ -7,14 +7,14 @@ This is the main script of the simulation
 
 # Simulation parameter
   ncores   = 10          # Number of cores (for workers) 	
-  N    	   = Int64(1e3)  # Number of Monte Carlo iterations 
-  dataset  = 1           # 0 = Financial data, 1 = Macroeconomic data 
+  N    	   = Int64(10)  # Number of Monte Carlo iterations 
+  dataset  = 1           # 0 = Financial data, 1 = Macroeconomic data (no lags), 2 = Macroeconomic data (including 4 lags)
   err_type = 1           # 0 = normal errors,  1 = t-distributed errors 
-  
+  diag_cov = true        # Use diagonal covariance matrix?
 
 # Set parameters for GLP code (N_glp = burnin sample)
-   N_glp 	= Int64(1e3)	
-   M_glp	= Int64(10e3) + N_glp
+   N_glp 	= Int64(1e1)	
+   M_glp	= Int64(1e1) + N_glp
 
 # Run script to load packages and prepare data (run only once (!))
   include("PrepareData.jl")
@@ -175,12 +175,33 @@ for jj = 1:length(ω)
     bss_nr[ii, jj]         = mean(getindex.(bkm_results_all, 2))
     bss_mse_shrunk[ii, jj] = 1 - mean(getindex.(bkm_results_all, 3))/MSE_hmean		
     bss_tp[ii, jj]         = mean(getindex.(bkm_results_all, 4))
-  
+
   # Show progress
     @info string("ω = ", ω[jj], "; ", "nz_β = ", nz_β[ii])
+    
+  # Check whether to reset workers for memory
+    if mod(ii, 3) == 0
+      rmprocs(workers())         # Close workers to free space
+      # Restart workers
+      addprocs(ncores)
+        @everywhere begin
+          using Pkg; Pkg.activate(".")  
+          using Random
+          using StatsBase
+          using LinearAlgebra
+          using Distributions
+          using GLMNet
+          using RCall
+          using Lasso  
+          BLAS.set_num_threads(1)
+          include("GLP_SpikeSlab.jl")
+          include("Functions.jl")
+        end
+      include("Compile_functions.jl") # Pre-compile functions
+    end                    
 
-		end
-	end
+  end
+end
 
 #-------------------------------------------------------------------------------------------#
 #-------------------------------------------------------------------------------------------#

@@ -26,4 +26,6 @@ Run 'include("Main_Script.jl")' in the REPL and wait.
 
 Close workers with rmprocs(workers())
 
+"Main_Script_2.jl" is for replicating the results of Figure 5
+
 
