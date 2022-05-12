@@ -1,6 +1,6 @@
 # DetectSparsity
 This repository contains the replication codes for 
-"Detecting the Sparsity Levels of Economic Time Series: On the Impact of Noise" by
+"Economic Time Series Predictions and the Illusion of Support Recovery" by
 [Adämmer and Schüssler (2022)](https://papers.ssrn.com/sol3/papers.cfm?abstract_id=4019646). The code is mainly written in Julia but we also use R for some routines and visualizations.  We have also rewritten the Matlab code by [Giannone et al. (2021) ](https://www.econometricsociety.org/publications/econometrica/2021/09/01/economic-predictions-big-data-illusion-sparsity) in Julia.
 
 # Codes
