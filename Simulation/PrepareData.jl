@@ -27,27 +27,31 @@ the data as well as pre-allocates the matrices for the main simulation
   using Lasso
   using Plots
  
- # Set up workers for parallelization
+# Set up workers for parallelization
   BLAS.set_num_threads(1)
-	addprocs(ncores)
-	@everywhere begin
-		using Pkg; Pkg.activate(".")  
-		using Random
-		using StatsBase
-		using LinearAlgebra
-		using Distributions
-		using GLMNet
-		using RCall
-    using Lasso  
-		BLAS.set_num_threads(1)
-		include("GLP_SpikeSlab.jl")
-		include("Functions.jl")
-	end
+
+# Add workers if only one is active
+  if nprocs() == 1 
+    addprocs(ncores - 1)
+    @everywhere begin
+      using Pkg; Pkg.activate(".")  
+      using Random
+      using StatsBase
+      using LinearAlgebra
+      using Distributions
+      using GLMNet
+      using RCall
+      using Lasso  
+      BLAS.set_num_threads(1)
+      include("GLP_SpikeSlab.jl")
+      include("Functions.jl")
+    end
+end
 
 	
 #---------------------------------------------------------------------------------------------------#	
 #------------------------------------- Load data sets ----------------------------------------------#
-#----------------------------------------------------------------------------------------------------#
+#---------------------------------------------------------------------------------------------------#
 
 if dataset == 0
     # Types for GW and Pyun data 
@@ -72,7 +76,7 @@ if dataset == 0
                               types = coltypes, DataFrame) 
       Xall.date   = Date.(Xall.date, "yyyy-mm-dd")        
     
-    # Compute correlation Matrix untile 12-1969 
+    # Compute correlation Matrix until 12-1969 
       corx       = cor(Matrix(Xall[1:findfirst(i -> i == Date("1969-12-01"), Xall.date), Not(:date)]))
       corx       = UpperTriangular(corx)
       removecols = unique(getindex.(findall(i -> (abs(i) >= 0.95 && i !==1.0), corx), 2)) .+ 1
@@ -102,7 +106,7 @@ if dataset == 0
     removecols = unique(getindex.(findall(i -> i .>= 0.95, corx), 2))  .+ 1 # Add one because :date is first column in DataFrame 
     Xall       = Xall[:, Not(removecols[2:end])] # Start at second position because INDPRO and INPRO_lag are identical
 
-     # Remove 'Covid sample'    
+  # Remove 'Covid sample'    
      Xall     = filter(row -> row.date <= Date("2019-12-01"), Xall)
 
  end
@@ -148,9 +152,9 @@ if dataset == 0
   q0  = Int64(140)  
   τ0  = Int64(60)
   n   = q0 + τ0 + 1                  		 
-  if dataset == 0 || dataset == 2
+  if dataset == 0 
     ω  	= [1.0; 3.0; 5.0; 8.0; 10.0; 15.0; 20.0] 
-  elseif dataset == 1
+  elseif dataset == 1 || dataset == 2
     ω  	= [1.0; 1.5; 2.0; 2.5; 3.0; 3.5; 4.0] 
   end
   α        = [0.0; 0.5;  1.0]		        

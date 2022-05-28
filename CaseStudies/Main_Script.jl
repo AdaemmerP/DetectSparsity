@@ -34,7 +34,7 @@
 # Set number of cores for OpenBlas
   BLAS.set_num_threads(1)
 
-# Set up workers for parallelization (only run line 40 once!)
+# Set up workers for parallelization (run line 38 only once!)
   addprocs(10)
   @everywhere begin
     using Pkg; Pkg.activate(".")  
@@ -54,17 +54,17 @@
   include("GLP_SpikeSlab.jl")
   include("Functions.jl")
   
-# Pre-compile all functions for later speedup (only run once)
+# Pre-compile all functions for later speedup (run only once)
   include("Compile_functions.jl")
 
 # Choose dataset
   dataset = 4 # 1: y = US excess stock returns,         x = Goyal Welch predictors  
               # 2: y = US excess stock returns,         x = Goyal Welch and Pyun predictor
               # 3: y = US industrial production growth, x = macroeconomic variables
-              # 4: y = US industrial production growth, x = macroeconomic variables (including up to 4 lags of INDPRO)
+              # 4: y = US industrial production growth, x = macroeconomic variables (including 4 lags of INDPRO)
               # 5: y = US industrial production growth, x = Only 4 lags of INDPRO
 
-  covid_out = false # End in '2019-12-01'? Only for macroeconomic data (datasets 3 & 4)
+  covid_out = false # End in '2019-12-01'? Only for macroeconomic data (datasets 3 - 5)
               
 # Load data
   include("LoadandPrepare.jl")

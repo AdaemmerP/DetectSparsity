@@ -29,21 +29,24 @@ the data for Figure 5
  
  # Set up workers for parallelization
   BLAS.set_num_threads(1)
-	addprocs(ncores)
-	@everywhere begin
-		using Pkg; Pkg.activate(".")  
-		using Random
-		using StatsBase
-		using LinearAlgebra
-		using Distributions
-		using GLMNet
-		using RCall
-    using Lasso  
-		BLAS.set_num_threads(1)
-		include("GLP_SpikeSlab.jl")
-		include("Functions.jl")
-	end
 
+ # Add workers of only one is active
+  if nprocs() == 1 
+    addprocs(ncores - 1)
+    @everywhere begin
+      using Pkg; Pkg.activate(".")  
+      using Random
+      using StatsBase
+      using LinearAlgebra
+      using Distributions
+      using GLMNet
+      using RCall
+      using Lasso  
+      BLAS.set_num_threads(1)
+      include("GLP_SpikeSlab.jl")
+      include("Functions.jl")
+    end
+end
 	
 #---------------------------------------------------------------------------------------------------#	
 #------------------------------------- Load data sets ----------------------------------------------#

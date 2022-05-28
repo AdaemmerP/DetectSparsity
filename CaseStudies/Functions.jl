@@ -582,7 +582,7 @@ end
     index        = 1
 
    for jj in comb_t
-      
+      #  
       @inbounds vec_avrgs[index] = @views mean(fcasts_mat[jj[1], jj[2]])
       index += 1
 

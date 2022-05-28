@@ -8,7 +8,7 @@
 # Simulation parameter
   ncores   = 10          # Number of cores (for workers) 	
   N    	   = Int64(1e3)  # Number of Monte Carlo iterations 
-  dataset  = 1           # 0 = Financial data, 1 = Macroeconomic data 
+  dataset  = 1           # 0 = Financial data, 1 = Macroeconomic data (no lags)
   err_type = 1           # 0 = normal errors,  1 = t-distributed errors 
   
 
