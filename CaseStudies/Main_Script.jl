@@ -125,7 +125,7 @@
 
 
 #-------------------------------------------------------------------------------#
-#  The following codes are additional and the results are not shown in the paper 
+#  The results of the following methods are not shown in the paper 
 #-------------------------------------------------------------------------------#
 
 #-------------------------------------------------------------------------------#	
