@@ -137,7 +137,6 @@
 # # ----------  BSS (with time series CV) Only use for the financial data  --- #
 # #-------------------------------------------------------------------------------#
 # Only run this code for the financial datasets! (dataset = 1 or 2)
-# # Run script
  #  @time include("07_BSS_tscv.jl")
 
 
