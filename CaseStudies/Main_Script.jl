@@ -35,6 +35,7 @@
   BLAS.set_num_threads(1)
 
 # Set up workers for parallelization (run line 38 only once!)
+if nprocs() == 1
   addprocs(10)
   @everywhere begin
     using Pkg; Pkg.activate(".")  
@@ -49,16 +50,14 @@
     include("Functions.jl")	
     include("GLP_SpikeSlab.jl")
   end
+end
 
 # Load script with functions  
   include("GLP_SpikeSlab.jl")
   include("Functions.jl")
   
-# Pre-compile all functions for later speedup (run only once)
-  include("Compile_functions.jl")
-
 # Choose dataset
-  dataset = 4 # 1: y = US excess stock returns,         x = Goyal Welch predictors  
+  dataset = 1 # 1: y = US excess stock returns,         x = Goyal Welch predictors  
               # 2: y = US excess stock returns,         x = Goyal Welch and Pyun predictor
               # 3: y = US industrial production growth, x = macroeconomic variables
               # 4: y = US industrial production growth, x = macroeconomic variables (including 4 lags of INDPRO)
@@ -68,6 +67,30 @@
               
 # Load data
   include("LoadandPrepare.jl")
+
+# Date vectors with start dates
+# First tuple entry: dataset. 
+# Second tuple entries: starting days
+  sdates_val = [(0, "2015-09-01"),
+                (1, "1954-11-01", "1993-11-01"),
+                (2, "1993-11-01"),
+                (3, "1964-11-01"),
+                (4, "1964-11-01"),
+                (5, "1964-11-01")]
+
+  sdates_noval = [(0, "2020-09-01"),
+                  (1, "1959-11-01", "1998-11-01"),
+                  (2, "1998-11-01"),
+                  (3, "1969-11-01"),
+                  (4, "1969-11-01"),
+                  (5, "1969-11-01")]
+
+ # Number of observations for time series cross validation            
+   τ0 = 60            
+
+# Pre-compile all functions for later speedup (run only once)
+  include("Compile_functions.jl")
+
 #-------------------------------------------------------------------------------#
 
 

@@ -1,29 +1,11 @@
-# Set start dates
-  if dataset == 0
+ # Extract start dates 
+ startdate   = sdates_val[findfirst(first.(sdates_val) .== dataset)][2:end]
 
-    startdate   = ["2015-09-01"]  
-
-  elseif dataset == 1   
-
-    startdate  = ["1954-11-01", "1993-11-01"] 
-
-  elseif dataset == 2 
-
-    startdate  = ["1993-11-01"] 
-
-  elseif dataset == 3 || dataset == 4 || dataset == 5
-
-    startdate  = ["1964-11-01"] 
- 
-  end
-
-
-# Loop for all start dates  
+# Loop to run all samples
   for jj = 1:length(startdate)
 
     # Set parameters for model
       q0	= (findfirst(isequal.(Date(startdate[jj]), Xall.date))) |> Int64	 
-      τ0  = 60
 
     # Compute all models with time series cross validation	
       results_all = map(i -> glmnet_forecasts_cvts(x, y_lead, q0, τ0, i), αvec)

@@ -5,7 +5,8 @@ This script runs all main functions once for compilation
   @info string("Compiling functions...")
 
 # Only few observations
-  dataset   = 0 
+  dataset_true = dataset
+  dataset      = 0 
  
 # Load and prepare data
   include("LoadandPrepare.jl")
@@ -61,6 +62,10 @@ This script runs all main functions once for compilation
   ζ = [0.0, 0.25, 0.5, 0.75, 1.0] # Levels of relaxation
 
   include("05_Glmnet_relaxed.jl")  
+
+ # Reset original dataset 
+   dataset = dataset_true
+   include("LoadandPrepare.jl")
 
   @info string("Compilation completed")
 

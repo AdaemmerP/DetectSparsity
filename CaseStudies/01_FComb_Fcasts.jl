@@ -1,42 +1,24 @@
+# Extract start dates 
+  startdate   = sdates_val[findfirst(first.(sdates_val) .== dataset)][2:end]
 
-# Set start dates (0 = pre-compilation only)
-  if dataset       == 0    
-  
-      startdate   = ["2015-09-01"]   
+# Get combinations of univariate forecasts (+1 because historical mean will be added)
+  size_x2 = (size(x, 2)) + 1
+  if last(size_x2) > 20
+      model_comb   = reduce(vcat, map(ii -> collect(combinations(1:size_x2, ii)), (1:3)))
+      model_comb   = vcat(model_comb, [collect(2:(size_x2))])
+  else
+      model_comb   = collect(combinations(1:size_x2)) 
+  end  
 
-    elseif dataset == 1  
-  
-      startdate   = ["1954-11-01", "1993-11-01"]    
+# Convert to Int8
+  model_comb = @views convert(Vector{Vector{Int8}}, model_comb)
 
-    elseif dataset == 2
-
-      startdate   = ["1993-11-01"]      
-
-    elseif  dataset == 3 || dataset == 4 || dataset == 5
-
-      startdate   = ["1964-11-01"] 
-
-  end
-
-  # Get combinations of univariate forecasts (+ 1 because historical mean will be added=
-    size_x2 = (size(x, 2)) + 1
-    if last(size_x2) > 20
-        model_comb   = reduce(vcat, map(ii -> collect(combinations(1:size_x2, ii)), (1:3)))
-        model_comb   = vcat(model_comb, [collect(2:(size_x2))])
-    else
-        model_comb   = collect(combinations(1:size_x2)) 
-    end  
-
-  # Convert to Int8
-    model_comb = @views convert(Vector{Vector{Int8}}, model_comb)
-
-#  Loop to run all samples
+# Loop to run all samples
   for jj = 1:length(startdate)
 
     # Set initial parameters and make iterators
-      q0  = (findfirst(isequal.(Date(startdate[jj]), Xall.date))) |> Int64
-      τ0  = 60
-      moos_total = size(x, 1) - q0 - 1 # Total number of OOS forecasts (!= final forecast number)
+      q0           = (findfirst(isequal.(Date(startdate[jj]), Xall.date))) |> Int64
+      moos_total   = size(x, 1) - q0 - 1 # Total number of OOS forecasts (!= final forecast number)
       sample_train = map(i -> 1:(q0 + i), 0:(moos_total - 1)) 
     
     # Compute historical mean	x

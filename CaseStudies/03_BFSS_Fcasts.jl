@@ -1,23 +1,7 @@
-# Set start dates
-  if dataset == 0   
+# Extract start dates 
+  startdate   = sdates_noval[findfirst(first.(sdates_noval) .== dataset)][2:end]
 
-      startdate = ["2020-09-01"]
-
-    elseif  dataset == 1    
-
-      startdate = ["1959-11-01"; "1998-11-01"]  
-
-    elseif  dataset == 2  
-
-      startdate = ["1998-11-01"] 
-
-    elseif  dataset == 3 || dataset == 4 || dataset == 5
-
-      startdate = ["1969-11-01"] 
-
-  end
-
-# Loop to get forecasts for oos samples
+# Loop to run all samples
   for jj = 1:length(startdate)
 
     # Initial months for training
