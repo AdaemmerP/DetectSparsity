@@ -14,20 +14,23 @@ but with a fixed number of N (here N = ncores)
 																		 err_type, ν, i), 1:ncores)
 
 # Forecast combinations
-  ThreadsX.map(i -> fcomb_simul(xysim_data_prec[i], sample_train, model_comb, models_univ_time, comb_t,
+  pmap(i -> fcomb_simul(xysim_data_prec[i], sample_train, model_comb, models_univ_time, comb_t,
                        β_actpre[i]), 1:ncores)  
+  @info string("Forecast combinations compiled.")
 
 # Glmnet
-  ThreadsX.map(i -> glmnet_simul_cvts(xysim_data_prec[i][:, 1], 
+  pmap(i -> glmnet_simul_cvts(xysim_data_prec[i][:, 1], 
                                       xysim_data_prec[i][:, 2:end], 
                                       q0, τ0, 1.0,
-                                      β_actpre[i]), 1:ncores);
+                                      β_actpre[i]), 1:ncores)
+  @info string("Lasso, Ridge, E-Net compiled.")                                     
 
 # Relaxed Lasso               
   pmap(ii -> glmnet_relaxed_cvts(xysim_data_prec[ii][:, 1], 
                                  xysim_data_prec[ii][:, 2:end], 
                                  q0, τ0, 1.0, ζ,
-                                 β_actpre[ii]), 1:ncores)               
+                                 β_actpre[ii]), 1:ncores)     
+  @info string("Relaxed Lasso compiled.")                                          
 
 # GLP
 	pmap(ii -> GLP_oos(xysim_data_prec[ii][1:(end - 1), 2:end], xysim_data_prec[ii][end, 2:end], 
@@ -36,9 +39,11 @@ but with a fixed number of N (here N = ncores)
 									   Int64(floor(abs(sum(xysim_data_prec[ii])))),
                      β_actpre[ii]), 
 									   1:ncores)
+ @info string("Bayesian approach compiled.")                     
 
 # BKM
   pmap(ii -> bkm_predict(xysim_data_prec[ii], collect(1:(n - 1)), n, β_actpre[ii]), 1:ncores) 
+  @info string("Best Subset compiled.")          
   
 # Adaptive Lasso 
   pmap(ii -> 
@@ -46,7 +51,7 @@ but with a fixed number of N (here N = ncores)
                         xysim_data_prec[ii][:, 2:end], 
                         q0, τ0,
                         β_actpre[ii]), 1:ncores)
-
+  @info string("Adaptive compiled.")          
 		
 # Info message
-  @info string("Compilation completed")					
+  @info string("Compilation completed.")					

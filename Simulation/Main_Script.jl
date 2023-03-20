@@ -3,18 +3,18 @@ This is the main script of the simulation
 """
 
 # Set path to data
-  data_path = ""
+  data_path = "/home/adaemmerp/Dropbox/HSU/Projekte/Mit_Rainer/GLP_SparseDense/Codes_GH/DetectSparsity_Julia_1.8/Data/"
 
 # Simulation parameter
-  ncores   = 12          # Number of cores (for workers) 	
+  ncores   = 14         # Number of cores (for workers) 	
   N    	   = Int64(1e3)  # Number of Monte Carlo iterations 
-  dataset  = 2           # 0 = Financial data, 1 = Macroeconomic data (no lags), 2 = Macroeconomic data (including 4 lags)
-  err_type = 1           # 0 = normal errors,  1 = t-distributed errors 
-  diag_cov = true        # Use diagonal covariance matrix?
+  dataset  = 0          # 0 = Financial data, 1 = Macroeconomic data (no lags), 2 = Macroeconomic data (including 4 lags)
+  err_type = 1          # 0 = normal errors,  1 = t-distributed errors 
+  diag_cov = false      # Use diagonal covariance matrix?
 
 # Set parameters for GLP code (N_glp = burnin sample)
-   N_glp 	= Int64(1e3)	
-   M_glp	= Int64(10e3) + N_glp
+  N_glp = Int64(1e3)	
+  M_glp	= Int64(10e3) + N_glp
 
 # Run script to load packages and prepare data (run only once (!))
   include("PrepareData.jl")
@@ -40,7 +40,7 @@ for jj = 1:length(ω)
     xysim_data  = map(kk -> data_simul(n, βx , Σ_x, μx, ω[jj], β_active[kk], ϕx, 
                                        err_type, ν, (kk + ii)), 1:N)                          																 
 
-  # Compute historical mean	
+  # Compute MSE for historical mean	
     MSE_hmean = @views mean(map(kk -> (mean(xysim_data[kk][1:(end - 1), 1]) - 
                                             xysim_data[kk][end, 1])^2, 1:N))
 
@@ -49,8 +49,12 @@ for jj = 1:length(ω)
 #------------------------------------- Forecast combinations ---------------------------------------#																							
    results_fc_all  = ThreadsX.map(eachrow(xydata_βact)) do kk 
 
-                          fcomb_simul(kk[1], sample_train, model_comb, 
-                                      models_univ_time, comb_t, kk[2])
+                          fcomb_simul(kk[1], 
+                                      sample_train, 
+                                      model_comb, 
+                                      models_univ_time, 
+                                      comb_t, 
+                                      kk[2])
 
                       end
   
@@ -82,7 +86,9 @@ for jj = 1:length(ω)
 
                   glmnet_simul_cvts(xysim_data[kk[1]][:, 1], 
                                     xysim_data[kk[1]][:, 2:end], 
-                                    q0, τ0, kk[2],
+                                    q0, 
+                                    τ0, 
+                                    kk[2],
                                     β_active[kk[1]])                                  
                                                               
               end        
@@ -179,26 +185,26 @@ for jj = 1:length(ω)
   # Show progress
     @info string("ω = ", ω[jj], "; ", "nz_β = ", nz_β[ii])
     
-  # Check whether to reset workers for memory
-    if mod(ii, 3) == 0
-      rmprocs(workers())         # Close workers to free space
-      # Restart workers
-      addprocs(ncores)
-        @everywhere begin
-          using Pkg; Pkg.activate(".")  
-          using Random
-          using StatsBase
-          using LinearAlgebra
-          using Distributions
-          using GLMNet
-          using RCall
-          using Lasso  
-          BLAS.set_num_threads(1)
-          include("GLP_SpikeSlab.jl")
-          include("Functions.jl")
-        end
-      include("Compile_functions.jl") # Pre-compile functions
-    end                    
+  # # Check whether to reset workers for memory
+  #   if mod(ii, 3) == 0
+  #     rmprocs(workers())         # Close workers to free space
+  #     # Restart workers
+  #     addprocs(ncores)
+  #       @everywhere begin
+  #         using Pkg; Pkg.activate(".")  
+  #         using Random
+  #         using StatsBase
+  #         using LinearAlgebra
+  #         using Distributions
+  #         using GLMNet
+  #         using RCall
+  #         using Lasso  
+  #         BLAS.set_num_threads(1)
+  #         include("GLP_SpikeSlab.jl")
+  #         include("Functions.jl")
+  #       end
+  #     include("Compile_functions.jl") # Pre-compile functions
+  #  end                    
 
   end
 end
@@ -348,11 +354,11 @@ end
                       booktabs = TRUE)                      
 
     dstring <- if(err_type == 0) "_DN.RData" else "_DT.RData"
-    # save(all_tables, file = paste("SimTables", dstring, sep = ""))
+    save(all_tables, file = paste("SimTables_finance_18_03_23", dstring, sep = ""))
   """
 
-# Close workers
-  rmprocs(workers())
+ # Close workers
+   rmprocs(workers())
 
 
 

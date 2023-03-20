@@ -67,8 +67,10 @@ function data_simul(n::Int64,
         xtrain = hcat(ones(size(xtrain, 1)), xtrain)
 
         # Compute coefficients 	
-        βhat 	 = GLM.lm(xtrain, ytrain) 						
-        yhat   = GLM.predict(βhat, [1.0 xtest'])[1] 
+        βhat 	 = inv((xtrain'*xtrain))xtrain'*ytrain         
+        yhat   = ([1.0 xtest']*βhat)[1] 
+        # βhat 	 = GLM.lm(xtrain, ytrain) 						
+        # yhat   = GLM.predict(βhat, [1.0 xtest'])[1] 
 
     else
 
@@ -130,10 +132,16 @@ function fcomb_simul(xy_mat, sample_train,
     # Compute historical mean	(same as regression with constant only)
       hist_mean = @views map(i -> mean(y_temp[i]), sample_train)
       
+      
     # Compute all individual forecasts	
       fcast_univ::Matrix{Float64} = map(i -> ols_forecasts(x_temp[i[1], i[2]], 
-                                        y_temp[i[1]], 
-                                        x_temp[last(i[1]) + 1, i[2]]), models_univ_time)
+                                              y_temp[i[1]], 
+                                              x_temp[last(i[1]) + 1, i[2]]), models_univ_time)
+
+      # fcast_univ = zeros(size(models_univ_time))
+      # broadcast!(i -> ols_forecasts(x_temp[i[1], i[2]], 
+      #                 y_temp[i[1]], 
+      #                 x_temp[last(i[1]) + 1, i[2]]), fcast_univ, models_univ_time)
 
     # Add historical mean and shrink individual models towards the historical mean (model 2) 																													 
       fcast_univ = hcat(hist_mean, fcast_univ)        	

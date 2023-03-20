@@ -25,7 +25,7 @@
   using Distributed
 
 # Set data path 
-  data_path = ""
+  data_path = "/home/adaemmerp/Dropbox/HSU/Projekte/Mit_Rainer/GLP_SparseDense/Codes_GH/DetectSparsity_Julia_1.8/Data/"
 
 # Set path to save results (only necessary when 'save_results = true')
   save_path    = "" 
@@ -57,7 +57,7 @@ end
   include("Functions.jl")
   
 # Choose dataset
-  dataset = 1 # 1: y = US excess stock returns,         x = Goyal Welch predictors  
+  dataset = 2 # 1: y = US excess stock returns,         x = Goyal Welch predictors  
               # 2: y = US excess stock returns,         x = Goyal Welch and Pyun predictor
               # 3: y = US industrial production growth, x = macroeconomic variables
               # 4: y = US industrial production growth, x = macroeconomic variables (including 4 lags of INDPRO)

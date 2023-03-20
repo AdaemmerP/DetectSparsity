@@ -26,6 +26,7 @@ the data for Figure 5
 	using Distributed
   using Lasso
   using Plots
+  #using SlurmClusterManager
  
  # Set up workers for parallelization
   BLAS.set_num_threads(1)
@@ -33,6 +34,7 @@ the data for Figure 5
  # Add workers of only one is active
   if nprocs() == 1 
     addprocs(ncores - 1)
+   # addprocs(SlurmManager())
     @everywhere begin
       using Pkg; Pkg.activate(".")  
       using Random
@@ -119,8 +121,8 @@ if dataset == 0
   ν = @rget nu_est
 
 # Simulation parameters
-  q0  = Int64(140)  
-  τ0  = Int64(60)
+  q0  = Int64(140)  # Training length 
+  τ0  = Int64(60)   # Length for cross validation
   n   = q0 + τ0 + 1                  		 
   if dataset == 0
     ω  	= [10.0; 8.0; 5.0] 
@@ -145,7 +147,7 @@ if dataset == 0
   sample_train      = @views map(x -> 1:(q0 + x), 0:(moos_total - 1)) 
   models_univ_time  = collect(Iterators.product(Tuple(x for x in sample_train), nr_preds)) # Iterators for univariate forecasts
 
-  if dataset == 0
+  if dataset     == 0
 	  model_comb   = collect(combinations(1:(last(nr_preds) + 1))) # ('+1' because intercept only will be added)
   elseif dataset == 1
     model_comb   = reduce(vcat, map(ii -> collect(combinations(1:(size(x_mat, 2) + 1), ii)), (1:3)))
@@ -155,33 +157,41 @@ if dataset == 0
 # Iterators for forecast combinations  
   comb_t = (collect(Iterators.product(1:moos_total, model_comb)))
 	
+# Character string for column names
+  if dataset == 0 
+    col_names = ["nb_3"; "nb_6"; "nb_13"]
+  elseif dataset == 1 
+    col_names = ["nb_5"; "nb_50"; "nb_100"]
+  end
+ 
+
 # Pre-allocate for forecast combinations
   fccomb_flex_nr              = DataFrame(zeros(N, length(ω)), :auto);
-  rename!(fccomb_flex_nr, ["nb_5"; "nb_50"; "nb_100"])
+  rename!(fccomb_flex_nr, col_names)
   fccomb_flex_nr[!, :Method] .= "FC-Flex"
 
 # Pre-allocate for glmnets  
   enet_nr               = DataFrame(zeros(N, length(ω)), :auto);
-  rename!(enet_nr, ["nb_5"; "nb_50"; "nb_100"])
+  rename!(enet_nr, col_names)
   enet_nr[!, :Method]  .= "Elastic Net" 
 
   lasso_nr              = DataFrame(zeros(N, length(ω)), :auto);
-  rename!(lasso_nr, ["nb_5"; "nb_50"; "nb_100"])
+  rename!(lasso_nr, col_names)
   lasso_nr[!, :Method] .= "Lasso"
 
   lasso_relax_nr    = DataFrame(zeros(N, length(ω)), :auto);
-  rename!(lasso_relax_nr, ["nb_5"; "nb_50"; "nb_100"])
+  rename!(lasso_relax_nr, col_names)
   lasso_relax_nr[!, :Method] .= "Relaxed Lasso"
 # lasso_adapt_nr   = zeros(length(nz_β), length(ω));
 
 # Pre-allocate for Bayesian FSS
   glp_nr  = DataFrame(zeros(N, length(ω)), :auto);
-  rename!(glp_nr, ["nb_5"; "nb_50"; "nb_100"])
+  rename!(glp_nr, col_names)
   glp_nr[!, :Method] .= "BFSS"
 
 # Pre-allocate for BKM
   bss_nr   =  DataFrame(zeros(N, length(ω)), :auto);
-  rename!(bss_nr, ["nb_5"; "nb_50"; "nb_100"])
+  rename!(bss_nr, col_names)
   bss_nr[!, :Method] .= "BSS"
 
     

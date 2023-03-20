@@ -10,8 +10,7 @@ This script runs all main functions once for compilation
  
 # Load and prepare data
   include("LoadandPrepare.jl")
-
-
+  
 #-------------------------------------------------------------------------------#	
 # ------------------ Forecast combinations (time series CV) ------------------- #
 #-------------------------------------------------------------------------------#	
@@ -21,6 +20,8 @@ This script runs all main functions once for compilation
 
 # Run script
   include("01_FComb_Fcasts.jl")
+  @info string("01_FComb_Fcasts.jl compiled.")
+
 
 
 #-------------------------------------------------------------------------------#	
@@ -29,6 +30,7 @@ This script runs all main functions once for compilation
 
 # Run script
   include("02_BSS_Fcasts.jl")
+  @info string("02_BSS_Fcasts.jl compiled.")
 
 #-------------------------------------------------------------------------------#	
 #---------------------------   GLP forecasts    --------------------------------#
@@ -41,6 +43,7 @@ This script runs all main functions once for compilation
 
 # Run script 
   include("03_BFSS_Fcasts.jl")
+  @info string("03_BFSS_Fcasts.jl compiled.")
 
 
 #-------------------------------------------------------------------------------#	
@@ -52,7 +55,7 @@ This script runs all main functions once for compilation
 
 # Run script
   include("04_Glmnet_Fcasts_tscv.jl")
-
+  @info string("04_Glmnet_Fcasts_tscv.jl compiled...")
 
 #-------------------------------------------------------------------------------#	
 #--------------------            Relaxed Lasso                  ----------------#
@@ -62,11 +65,12 @@ This script runs all main functions once for compilation
   ζ = [0.0, 0.25, 0.5, 0.75, 1.0] # Levels of relaxation
 
   include("05_Glmnet_relaxed.jl")  
+  @info string("05_Glmnet_relaxed.jl compiled...")
 
  # Reset original dataset 
    dataset = dataset_true
    include("LoadandPrepare.jl")
 
-  @info string("Compilation completed")
+  @info string("Compilation completed.")
 
 

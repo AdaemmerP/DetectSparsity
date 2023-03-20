@@ -5,10 +5,11 @@
   library(scales)
   library(stringr)
 
+# Source file with data paths
+  source("data_path.R")
+
 #--------------------- Plots for weak predictors (nrs) ------------------------#
-# Set data path here to "Results"
-  data_path <- ""
-  
+
 # Make plots
   setwd(paste(data_path, "GW_Data/1960/", sep = ""))
 
@@ -55,7 +56,7 @@
 
 # Make plot with number of predictors
   nr_weakpr <- ggplot(data = df_nr) +
-                 geom_point(aes(x = date, y = value), color = my_color[6], size = .05) +
+                 geom_point(aes(x = date, y = value), size = .05) +
                  theme_bw() +
                  theme(text             = element_text(size = 10),
                        axis.text        = element_text(size = 8),
@@ -64,7 +65,7 @@
                        axis.title.x     = element_text(margin  = margin(t = 5, r = 0, b = 0, l = 0)),
                        axis.text.x      = element_text(hjust = 0.6),
                        strip.background = element_blank(),
-                       panel.grid.minor = element_blank(),
+                       panel.grid       = element_blank(),
                        legend.position = "none",
                        panel.spacing.x  = unit(2, "lines")) +
                  ylab("# of nonzero coefficients") +
@@ -77,13 +78,19 @@
                               labels        = date_format("%Y"))
   nr_weakpr
 
- #---------------- Plots for relative inclusions
+  # Save plot
+  setwd(save_path)
+  pdf(file = "nr_weakp.pdf", width = 8, height = 10, pointsize = 8)
+  nr_weakpr
+  dev.off()
+
+#---------------- Plots for relative inclusions
 
  # File names
   file_names <- list.files()
 
  # Load first results
-  df_all <- tibble() 
+  df_all <- tibble()
 
  # Loop to add results
    for(jj in 1:length(file_names)){
@@ -119,8 +126,8 @@
   df_gg$method_new <- factor(df_gg$method, levels = flevels, labels = flabels)
 
 
-  inkl_weakpr <- ggplot(data = df_gg, aes(x = name, y = mean_val)) +
-                  geom_bar(stat = "identity", width = 0.6, fill = my_color[6], alpha = 0.5)+
+  inkl_weakp <- ggplot(data = df_gg, aes(x = name, y = mean_val)) +
+                  geom_bar(stat = "identity", width = 0.6, fill = "gray", alpha = 0.8)+
                   theme_bw() +
                   theme(text             = element_text(size = 10),
                         axis.text        = element_text(size = 8),
@@ -128,8 +135,7 @@
                         axis.title.y     = element_text(margin  = margin(t = 0,   r = 7.5, b = 0, l = 0)),
                         axis.title.x     = element_text(margin  = margin(t = 7.5, r = 0, b = 0, l = 0)),
                         strip.background = element_blank(),
-                        panel.grid.minor = element_blank(),
-                        panel.grid.major = element_blank(),
+                        panel.grid       = element_blank(),
                         legend.position = "none",
                         panel.spacing.x  = unit(2, "lines")) +
                   ylab("Relative inclusion") +
@@ -137,13 +143,22 @@
                   scale_x_discrete(guide = guide_axis(n.dodge=2)) +
                   facet_wrap(~method_new, labeller = label_parsed, ncol = 2, scales = "free") +
                   coord_cartesian(ylim = c(0, 1))
+  inkl_weakp
+
+
+  # Save plot
+  setwd(save_path)
+  pdf(file = "inkl_weakp.pdf", width = 8, height = 10, pointsize = 8)
   inkl_weakpr
+  dev.off()
+
+
 
 #------------------ Plots for included predictor by Pyun (2019) ---------------#
 
  # Set data path
   setwd(paste(data_path, "GWP_Data/1999/", sep = ""))
-  
+
  # File names
   file_names <- list.files()
 
@@ -217,7 +232,7 @@
    file_names <- list.files()
 
    # Load first results
-   df_all <- tibble() 
+   df_all <- tibble()
 
    # Loop to add results
    for(jj in 1:length(file_names)){
@@ -279,4 +294,3 @@
    inkl_strongpr
 
 
-    

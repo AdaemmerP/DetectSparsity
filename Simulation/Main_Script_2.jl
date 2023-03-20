@@ -1,15 +1,15 @@
 """
-# This is the main script for the simulation of Figure 5 
+# This is the main script for the histogram simulations
 # """
 
 # Set path to data
-  data_path = ""
+  data_path = "/home/adaemmerp/Dropbox/HSU/Projekte/Mit_Rainer/GLP_SparseDense/Codes_GH/DetectSparsity_Julia_1.8/Data/"
 
 # Simulation parameter
-  ncores   = 10          # Number of cores (for workers) 	
+  ncores   = 14          # Number of cores (for workers) 	
   N    	   = Int64(1e3)  # Number of Monte Carlo iterations 
-  dataset  = 1           # 0 = Financial data, 1 = Macroeconomic data (no lags)
-  err_type = 1           # 0 = normal errors,  1 = t-distributed errors 
+  dataset  = 0          # 0 = Financial data, 1 = Macroeconomic data (no lags)
+  err_type = 1          # 0 = normal errors,  1 = t-distributed errors 
   
 
 # Set parameters for GLP code (N_glp = burnin sample)
@@ -34,18 +34,22 @@ for ii = 1:length(nz_β)
 
 #------------------------------------- Simulate data -----------------------------------------------#
   # Simulate data
-    Random.seed!(4) # This seed equals the seed combination of the models in the table
+    Random.seed!(6) # 6: Equals seed combination for finance; 4: Equals seed combination for macro
     β_active    = map(kk -> sample(1:length(βx), nz_β[ii]; replace = false), 1:N) # Draw active predictors	  
     xysim_data  = map(kk -> data_simul(n, βx , Σ_x, μx, ω[ii], β_active[kk], ϕx, 
                                        err_type, ν, (kk + ii)), 1:N)                          																 
 
   # Merge simulated data and active predictors                                          
-    xydata_βact     = [xysim_data β_active]                                             
+    xydata_βact     = [xysim_data β_active]       
+                                          
 #------------------------------------- Forecast combinations ---------------------------------------#																							
-   results_fc_all  = ThreadsX.map(eachrow(xydata_βact)) do kk 
+   results_fc_all  = pmap(eachrow(xydata_βact)) do kk 
 
-                          fcomb_simul(kk[1], sample_train, model_comb, 
-                                      models_univ_time, comb_t, kk[2])
+                          fcomb_simul(kk[1], 
+                                      sample_train, 
+                                      model_comb, 
+                                      models_univ_time, 
+                                      comb_t, kk[2])
 
                       end
                                
@@ -57,11 +61,13 @@ for ii = 1:length(nz_β)
   αN_comb = collect(Iterators.product(1:N, α));	
 
 # Results for weak predictors
-  results_glmnet = ThreadsX.map(αN_comb) do kk
+  results_glmnet = pmap(αN_comb) do kk
 
                   glmnet_simul_cvts(xysim_data[kk[1]][:, 1], 
                                     xysim_data[kk[1]][:, 2:end], 
-                                    q0, τ0, kk[2],
+                                    q0, 
+                                    τ0, 
+                                    kk[2],
                                     β_active[kk[1]])                                  
                                                               
               end        
@@ -116,14 +122,18 @@ for ii = 1:length(nz_β)
 end
 
 results_all = [fccomb_flex_nr; 
-              enet_nr; lasso_nr; lasso_relax_nr;
-              glp_nr; bss_nr; ]
+               bss_nr; 
+               lasso_relax_nr;
+               lasso_nr; 
+               enet_nr; 
+               glp_nr; ]
+
 
 @rput results_all
 
 # Save DataFrame as data.frame for ggplot
 R"""
-  save(results_all, file = "Sim_df_indiv.RData")
+  save(results_all, file = "Sim_Hist_Financial_n200.RData")
 """
 
 # Close workers
