@@ -3,7 +3,7 @@
 # """
 
 # Set path to data
-  data_path = "/home/adaemmerp/Dropbox/HSU/Projekte/Mit_Rainer/GLP_SparseDense/Codes_GH/DetectSparsity_Julia_1.8/Data/"
+  include("data_path.jl")
 
 # Simulation parameter
   ncores   = 14          # Number of cores (for workers) 	

@@ -3,10 +3,10 @@ This is the main script of the simulation
 """
 
 # Set path to data
-  data_path = "/home/adaemmerp/Dropbox/HSU/Projekte/Mit_Rainer/GLP_SparseDense/Codes_GH/DetectSparsity_Julia_1.8/Data/"
+  include("data_path.jl")
 
 # Simulation parameter
-  ncores   = 14         # Number of cores (for workers) 	
+  ncores   = 2         # Number of cores (for workers) 	
   N    	   = Int64(1e3)  # Number of Monte Carlo iterations 
   dataset  = 0          # 0 = Financial data, 1 = Macroeconomic data (no lags), 2 = Macroeconomic data (including 4 lags)
   err_type = 1          # 0 = normal errors,  1 = t-distributed errors 
