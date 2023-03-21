@@ -149,8 +149,6 @@ if dataset == 0
   ν = @rget nu_est
 
 # Simulation parameters
-  q0  = Int64(140)  
-  τ0  = Int64(60)
   n   = q0 + τ0 + 1                  		 
   if dataset == 0 
     ω  	= [1.0; 3.0; 5.0; 8.0; 10.0; 15.0; 20.0] 

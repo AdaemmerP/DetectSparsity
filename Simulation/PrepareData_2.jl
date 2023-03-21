@@ -110,6 +110,11 @@ if dataset == 0
 # Covariance matrix of residuals for predictors
   Σ_x = cov((x_mat - ϕx'.*lag(x_mat))[2:end, :]) 
 
+# If dataset == 2 use
+  if diag_cov == 1 
+    Σ_x = diag(Σ_x).*I(size(Σ_x, 1))
+  end
+
 # Estimate degrees of freedom 
   @rput y_GWP      
   R"""
@@ -121,8 +126,6 @@ if dataset == 0
   ν = @rget nu_est
 
 # Simulation parameters
-  q0  = Int64(140)  # Training length 
-  τ0  = Int64(60)   # Length for cross validation
   n   = q0 + τ0 + 1                  		 
   if dataset == 0
     ω  	= [10.0; 8.0; 5.0] 

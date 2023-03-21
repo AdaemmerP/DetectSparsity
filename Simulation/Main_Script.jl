@@ -6,11 +6,13 @@ This is the main script of the simulation
   include("data_path.jl")
 
 # Simulation parameter
-  ncores   = 2         # Number of cores (for workers) 	
+  ncores   = 2           # Number of cores (for workers) 	
   N    	   = Int64(1e3)  # Number of Monte Carlo iterations 
-  dataset  = 0          # 0 = Financial data, 1 = Macroeconomic data (no lags), 2 = Macroeconomic data (including 4 lags)
-  err_type = 1          # 0 = normal errors,  1 = t-distributed errors 
-  diag_cov = false      # Use diagonal covariance matrix?
+  dataset  = 0           # 0 = Financial data, 1 = Macroeconomic data (no lags), 2 = Macroeconomic data (including 4 lags)
+  err_type = 1           # 0 = normal errors,  1 = t-distributed errors 
+  diag_cov = false       # Use diagonal covariance matrix?
+  q0       = Int64(140)  
+  τ0       = Int64(60)
 
 # Set parameters for GLP code (N_glp = burnin sample)
   N_glp = Int64(1e3)	
@@ -47,7 +49,7 @@ for jj = 1:length(ω)
   # Merge simulated data and active predictors                                          
     xydata_βact     = [xysim_data β_active]                                             
 #------------------------------------- Forecast combinations ---------------------------------------#																							
-   results_fc_all  = ThreadsX.map(eachrow(xydata_βact)) do kk 
+   results_fc_all  = pmap(eachrow(xydata_βact)) do kk 
 
                           fcomb_simul(kk[1], 
                                       sample_train, 
@@ -82,7 +84,7 @@ for jj = 1:length(ω)
   αN_comb = collect(Iterators.product(1:N, α));	
 
 # Results for weak predictors
-  results_glmnet = ThreadsX.map(αN_comb) do kk
+  results_glmnet = pmap(αN_comb) do kk
 
                   glmnet_simul_cvts(xysim_data[kk[1]][:, 1], 
                                     xysim_data[kk[1]][:, 2:end], 

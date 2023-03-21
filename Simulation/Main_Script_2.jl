@@ -8,9 +8,10 @@
 # Simulation parameter
   ncores   = 14          # Number of cores (for workers) 	
   N    	   = Int64(1e3)  # Number of Monte Carlo iterations 
-  dataset  = 0          # 0 = Financial data, 1 = Macroeconomic data (no lags)
-  err_type = 1          # 0 = normal errors,  1 = t-distributed errors 
-  
+  dataset  = 0           # 0 = Financial data, 1 = Macroeconomic data (no lags)
+  err_type = 1           # 0 = normal errors,  1 = t-distributed errors 
+  q0       = Int64(140)  # Training length 
+  τ0       = Int64(60)   # Length for cross validation
 
 # Set parameters for GLP code (N_glp = burnin sample)
    N_glp 	= Int64(1e3)	
@@ -72,9 +73,9 @@ for ii = 1:length(nz_β)
                                                               
               end        
 
-  # Extratc number of included predictors 
-    enet_nr[:, ii]   = @views getindex.(results_glmnet[:, 1], 3)
-    lasso_nr[:, ii]	 = @views getindex.(results_glmnet[:, 2], 3)
+# Extratc number of included predictors 
+  enet_nr[:, ii]   = @views getindex.(results_glmnet[:, 1], 3)
+  lasso_nr[:, ii]	 = @views getindex.(results_glmnet[:, 2], 3)
  
 #------------------------------------- Relax Lasso  ----------------------------------------------#	 
 
