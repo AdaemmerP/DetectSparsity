@@ -44,19 +44,19 @@ for ii = 1:length(nz_β)
   # Merge simulated data and active predictors                                          
     xydata_βact     = [xysim_data β_active]       
                                           
-#------------------------------------- Forecast combinations ---------------------------------------#																							
-   results_fc_all  = pmap(eachrow(xydata_βact)) do kk 
+# #------------------------------------- Forecast combinations ---------------------------------------#																							
+#    results_fc_all  = pmap(eachrow(xydata_βact)) do kk 
 
-                          fcomb_simul(kk[1], 
-                                      sample_train, 
-                                      model_comb, 
-                                      models_univ_time, 
-                                      comb_t, kk[2])
+#                           fcomb_simul(kk[1], 
+#                                       sample_train, 
+#                                       model_comb, 
+#                                       models_univ_time, 
+#                                       comb_t, kk[2])
 
-                      end
+#                       end
                                
-  # Convert output to Matrix	 
-    fccomb_flex_nr[:, ii]  = @views getindex.(results_fc_all, 3)
+#   # Convert output to Matrix	 
+#     fccomb_flex_nr[:, ii]  = @views getindex.(results_fc_all, 3)
 
 #------------------------------------- Glmnet  ----------------------------------------------#	
 # Make all combinations of α and N
@@ -123,7 +123,7 @@ for ii = 1:length(nz_β)
 
 end
 
-results_all = [fccomb_flex_nr; 
+results_all = [#fccomb_flex_nr; 
                bss_nr; 
                lasso_relax_nr;
                lasso_nr; 
