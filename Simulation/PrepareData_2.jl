@@ -8,12 +8,13 @@ the data for Figure 5
 	Pkg.activate(".")
 
 # Load packages
+  using LinearAlgebra
+  using Dates
+	using Distributed
 	using DataFrames
 	using DataFramesMeta
-	using LinearAlgebra
 	using Distributions
 	using CSV
-	using Dates
 	using Chain
 	using StatsBase
 	using Combinatorics
@@ -23,7 +24,6 @@ the data for Figure 5
 	using GLMNet
 	using MLDataUtils
 	using RCall
-	using Distributed
   using Lasso
   using Plots
   #using SlurmClusterManager
@@ -34,7 +34,7 @@ the data for Figure 5
  # Add workers of only one is active
   if nprocs() == 1 
     addprocs(ncores - 1)
-   # addprocs(SlurmManager())
+    #addprocs(SlurmManager())
     @everywhere begin
       using Pkg; Pkg.activate(".")  
       using Random
@@ -130,7 +130,7 @@ if dataset == 0
   if dataset == 0
     ω  	= [10.0; 8.0; 5.0] 
   elseif dataset == 1
-    ω  	= [2.0; 1.5; 1.0] 
+    ω  	= [2.5; 2; 1.5] 
   end
   α        = [0.5;  1.0]		        
   ζ        = [0.0, 0.25, 0.5, 0.75, 1.0]          

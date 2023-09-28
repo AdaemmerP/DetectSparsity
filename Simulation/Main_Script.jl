@@ -6,7 +6,7 @@ This is the main script of the simulation
   include("data_path.jl")
 
 # Simulation parameter
-  ncores   = 2           # Number of cores (for workers) 	
+  ncores   = 3           # Number of cores (for workers) 	
   N    	   = Int64(1e3)  # Number of Monte Carlo iterations 
   dataset  = 0           # 0 = Financial data, 1 = Macroeconomic data (no lags), 2 = Macroeconomic data (including 4 lags)
   err_type = 1           # 0 = normal errors,  1 = t-distributed errors 

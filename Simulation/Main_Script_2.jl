@@ -6,16 +6,17 @@
   include("data_path.jl")
 
 # Simulation parameter
-  ncores   = 14          # Number of cores (for workers) 	
-  N    	   = Int64(1e3)  # Number of Monte Carlo iterations 
-  dataset  = 0           # 0 = Financial data, 1 = Macroeconomic data (no lags)
-  err_type = 1           # 0 = normal errors,  1 = t-distributed errors 
+  ncores   = 12          # Number of cores (for workers) 	
+  N    	   = Int64(1e2)  # Number of Monte Carlo iterations 
+  dataset  = 1           # 0 = Financial data, 1 = Macroeconomic data (no lags)
+  err_type = 0           # 0 = normal errors,  1 = t-distributed errors 
+  diag_cov = 0           # Use diagonal covariance matrix?
   q0       = Int64(140)  # Training length 
   τ0       = Int64(60)   # Length for cross validation
 
 # Set parameters for GLP code (N_glp = burnin sample)
    N_glp 	= Int64(1e3)	
-   M_glp	= Int64(10e3) + N_glp
+   M_glp	= Int64(10e2) + N_glp
 
 # Run script to load packages and prepare data (run only once (!))
   include("PrepareData_2.jl")

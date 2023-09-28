@@ -7,7 +7,7 @@
   source("data_path.R")
 
 # Load data
-  load(paste0(data_path,"Histogram_Macro_n200.RData"))
+  load(paste0(data_path,"Sim_Histograms/Histogram_Macro_n200_DiagCov.RData"))
 
   results_all <- results_all |>
                    mutate(Method = str_replace(Method, "Rel._lasso", "Relaxed~Lasso"))
@@ -24,10 +24,16 @@
                                                          "n[beta]~'='~50"  = "nb_50",
                                                          "n[beta]~'='~100" = "nb_100")) |>
                         mutate(Method = fct_relevel(Method, "FC-Flex", "BSS",
-                                                            "Relaxed~Lasso", "Lasso", "E-Net")) |>
-                        mutate(Method = fct_recode(Method, "Elastic~Net" = "E-Net",
+                                                           "Relaxed Lasso", "Lasso", "Elastic Net")) |>
+                        mutate(Method = fct_recode(Method, "Elastic~Net" = "Elastic Net", # "Elastic Net", # "E-Net",
+                                                           "Relaxed~Lasso" = "Relaxed Lasso",
                                                            "FC^{Flex}"   = "FC-Flex",
                                                            "Best~Subset" = "BSS"))
+
+# Remove FC^FLEX
+  results_all_tidy <- results_all_tidy |> 
+    filter(!(Method %in% "FC^{Flex}"))
+  
 
 # Tidy data set Financial
   results_all_tidy <- pivot_longer(results_all, !Method) |>
@@ -42,7 +48,12 @@
                                                    "Elastic~Net" = "Elastic Net",
                                                    "FC^{Flex}"   = "FC-Flex",
                                                    "Best~Subset" = "BSS"))
+  
+  # Remove FC^FLEX
+  results_all_tidy <- results_all_tidy |> 
+    filter(!(Method %in% "FC^{Flex}"))
 
+  
  # Make summary for values
    summary_vals <- results_all_tidy |>
                     mutate(true_val = as.numeric(str_extract(name, "\\d+"))) |>
@@ -53,7 +64,7 @@
 # Make ggplot
   p_sim <- ggplot(results_all_tidy) +
               geom_histogram(aes(x = value, y = ..density..),
-                             col = alpha("grey", 0.8), fill = "grey", alpha = .7, bins = 20) + # ,  binwidth = 1 (finance)
+                             col = alpha("grey", 0.8), fill = "grey", alpha = .7, bins = 20) +#) + # ,  binwidth = 1 (finance)
               #geom_density(aes(x = value, y = ..density..)) +
               facet_rep_grid(Method ~ name, labeller = label_parsed, scales = "free", repeat.tick.labels = T) +
               geom_vline(data = summary_vals, aes(xintercept = value, col = "Estimated number of predictors"),
@@ -85,6 +96,6 @@
 
   # Save plot
    setwd(save_path)
-   pdf(file = "p_sim_macro_n200.pdf", width = 8, height = 10, pointsize = 8)
+   pdf(file = "p_sim_macro_n200_DiagCov.pdf", width = 8, height = 9, pointsize = 8)
    p_sim
    dev.off()

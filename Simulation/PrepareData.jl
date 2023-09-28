@@ -8,22 +8,23 @@ the data as well as pre-allocates the matrices for the main simulation
 	Pkg.activate(".")
 
 # Load packages
-	using DataFrames
+  using LinearAlgebra
+  using Dates
+  using Random
+	using Distributed
+
+  using DataFrames
 	using DataFramesMeta
-	using LinearAlgebra
 	using Distributions
 	using CSV
-	using Dates
 	using Chain
 	using StatsBase
 	using Combinatorics
 	using GLM
 	using ThreadsX
-	using Random
 	using GLMNet
 	using MLDataUtils
 	using RCall
-	using Distributed
   using Lasso
   using Plots
  
