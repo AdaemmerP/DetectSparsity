@@ -140,5 +140,3 @@ R"""
 
 # Close workers
   rmprocs(workers())
-
- #  
