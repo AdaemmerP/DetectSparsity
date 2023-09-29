@@ -7,7 +7,7 @@
   source("data_path.R")
 
 # Load data
-  load(paste0(data_path,"Sim_Histograms/Histogram_Macro_n400.RData"))
+  load(paste0(data_path,"Sim_Histograms/Histogram_Finance_n400.RData"))
 
   results_all <- results_all |>
                    mutate(Method = str_replace(Method, "Rel._lasso", "Relaxed~Lasso"))
@@ -29,7 +29,7 @@
                                                            "Relaxed~Lasso" = "Relaxed Lasso",
                                                            "FC^{Flex}"   = "FC-Flex",
                                                            "Best~Subset" = "BSS",
-                                                            "VFSS" = "BFSS" ))
+                                                            "BVSS" = "BFSS" ))
 
 # Remove FC^FLEX
   results_all_tidy <- results_all_tidy |> 
@@ -48,7 +48,8 @@
                                                    "Relaxed~Lasso" = "Relaxed Lasso",
                                                    "Elastic~Net" = "Elastic Net",
                                                    "FC^{Flex}"   = "FC-Flex",
-                                                   "Best~Subset" = "BSS"))
+                                                   "Best~Subset" = "BSS",
+                                                   "BVSS" = "BFSS" ))
   
   # Remove FC^FLEX
   results_all_tidy <- results_all_tidy |> 
@@ -65,7 +66,7 @@
 # Make ggplot
   p_sim <- ggplot(results_all_tidy) +
               geom_histogram(aes(x = value, y = ..density..),
-                             col = alpha("grey", 0.8), fill = "grey", alpha = .7, bins = 20) +#) + # ,  binwidth = 1 (finance)
+                             col = alpha("grey", 0.8), fill = "grey", alpha = .7, binwidth = 1) + #bins = 20)  (macro)
               #geom_density(aes(x = value, y = ..density..)) +
               facet_rep_grid(Method ~ name, labeller = label_parsed, scales = "free_y", repeat.tick.labels = T) +
               geom_vline(data = summary_vals, aes(xintercept = value, col = "Estimated number of predictors"),
@@ -97,6 +98,6 @@
 
   # Save plot
    setwd(save_path)
-   pdf(file = "p_sim_macro_n400.pdf", width = 8, height = 9, pointsize = 8)
+   pdf(file = "p_sim_finance_n400.pdf", width = 8, height = 9, pointsize = 8)
    p_sim
    dev.off()
