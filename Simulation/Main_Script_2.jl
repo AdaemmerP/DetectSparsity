@@ -6,17 +6,17 @@
   include("data_path.jl")
 
 # Simulation parameter
-  ncores   = 12          # Number of cores (for workers) 	
-  N    	   = Int64(1e2)  # Number of Monte Carlo iterations 
+  ncores   = 1          # Number of cores (for workers) 	
+  N    	   = Int64(1e3)  # Number of Monte Carlo iterations 
   dataset  = 1           # 0 = Financial data, 1 = Macroeconomic data (no lags)
-  err_type = 0           # 0 = normal errors,  1 = t-distributed errors 
+  err_type = 1           # 0 = normal errors,  1 = t-distributed errors 
   diag_cov = 0           # Use diagonal covariance matrix?
-  q0       = Int64(140)  # Training length 
+  q0       = Int64(340)  # Training length 
   τ0       = Int64(60)   # Length for cross validation
 
 # Set parameters for GLP code (N_glp = burnin sample)
    N_glp 	= Int64(1e3)	
-   M_glp	= Int64(10e2) + N_glp
+   M_glp	= Int64(1e3) + N_glp
 
 # Run script to load packages and prepare data (run only once (!))
   include("PrepareData_2.jl")
@@ -77,6 +77,9 @@ for ii = 1:length(nz_β)
 # Extratc number of included predictors 
   enet_nr[:, ii]   = @views getindex.(results_glmnet[:, 1], 3)
   lasso_nr[:, ii]	 = @views getindex.(results_glmnet[:, 2], 3)
+
+  # Show progress
+  @info string("enet und lasso done.")
  
 #------------------------------------- Relax Lasso  ----------------------------------------------#	 
 
@@ -91,6 +94,9 @@ for ii = 1:length(nz_β)
                   end
  
   lasso_relax_nr[:, ii]  = @views getindex.(results_relax, 3)
+
+ # Show progress
+   @info string("relaxed lasso done.")
 
 
 #--------------------------------------------- GLP -----------------------------------------------#
@@ -107,6 +113,9 @@ for ii = 1:length(nz_β)
 # Save results
   glp_nr[:, ii]     = @views round.(getindex.(results_glp_all, 3), digits = 0)
 
+# Show progress
+  @info string("GLP done.")
+
 #-------------------------------------------- BSS  ---------------------------------------------#
   # Train and test observations
     train_seq = @views collect(1:(size(xysim_data[1], 1) - 1))
@@ -120,6 +129,27 @@ for ii = 1:length(nz_β)
 
   # Show progress
     @info string("ω = ", ω[ii], "; ", "nz_β = ", nz_β[ii])
+
+  # Relaunch workers
+  rmprocs(workers())
+  if nprocs() == 1 
+    addprocs(ncores - 1)
+    #addprocs(SlurmManager())
+    @everywhere begin
+      using Pkg; Pkg.activate(".")  
+      using Random
+      using StatsBase
+      using LinearAlgebra
+      using Distributions
+      using GLMNet
+      using RCall
+      using Lasso  
+      BLAS.set_num_threads(1)
+      include("GLP_SpikeSlab.jl")
+      include("Functions.jl")
+    end
+end
+include("Compile_functions.jl")
 
 end
 
@@ -135,7 +165,7 @@ results_all = [#fccomb_flex_nr;
 
 # Save DataFrame as data.frame for ggplot
 R"""
-  save(results_all, file = "Sim_Hist_Financial_n200.RData")
+  save(results_all, file = "Sim_Hist_Macro_n400.RData")
 """
 
 # Close workers

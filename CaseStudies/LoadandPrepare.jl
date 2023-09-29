@@ -3,8 +3,7 @@
 
     # For GW and Pyun data
       coltypes = Any[Float64 for i= 1:15] 
-      Xall     =  CSV.read(string(data_path, "GW_Data.csv"),
-                          types = coltypes, DataFrame) 
+      Xall     =  CSV.read(string(data_path, "GW_Data.csv"), types = coltypes, DataFrame) 
 
     # Drop missings, transform dates and eq_prem and get subset									 
       Xall = @chain Xall begin
