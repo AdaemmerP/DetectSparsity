@@ -1,11 +1,11 @@
-function GLP_SpikeSlab(y::Array{Float64}, 
-                       x::Matrix{Float64}, 
-                       u::Array{Float64}, 
-                       abeta::Float64, 
-                       bbeta::Float64, 
-                       Abeta::Float64, 
-                       Bbeta::Float64, 
-                       M::Int64)         
+function GLP_SpikeSlab(y, 
+                       x, 
+                       u, 
+                       abeta, 
+                       bbeta, 
+                       Abeta, 
+                       Bbeta, 
+                       M)         
 
 #-----------------------------------------------------------------------------------------------------------------------#
 # Code by Philipp Adämmer & Rainer Schüssler

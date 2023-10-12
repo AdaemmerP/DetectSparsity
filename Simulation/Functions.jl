@@ -1,16 +1,11 @@
 # ----------------------------------------------------------------	
 #               Function to simulate data
 # ----------------------------------------------------------------	
-function data_simul(n::Int64,
-                    β::Vector{Float64},
-                    Σ::Matrix{Float64},
-                    μ_x::Vector{Float64},
-                    ω::Float64,			
-                    β_active::Vector{Int64},					
-                    ϕ::Vector{Float64},
-                    err_type::Int64,
-                    ν::Float64,
-                    seed_it::Int64)
+function data_simul(n, β,
+                    Σ, μ_x,
+                    ω, β_active,					
+                    ϕ, err_type,
+                    ν, seed_it)
 
   # Set seed for reproducibility 
     Random.seed!(seed_it)
@@ -57,9 +52,9 @@ function data_simul(n::Int64,
 # ----------------------------------------------------------------	
 #         Function for univariate OLS forecasts
 # ----------------------------------------------------------------	
- function ols_forecasts(xtrain::Array{Float64}, 
-                        ytrain::Array{Float64}, 
-                        xtest::Union{Float64, Array{Float64}})
+ function ols_forecasts(xtrain, 
+                        ytrain, 
+                        xtest)
 
   if mean(xtrain) != 1.0								
 
@@ -171,12 +166,9 @@ function fcomb_simul(xy_mat, sample_train,
 # -------------------------------------------------------------------------	
 #             Glmnet forecasts with time series cross validation 
 # -------------------------------------------------------------------------	
-function glmnet_simul_cvts(y_temp::Vector{Float64}, 
-                           x_temp::Matrix{Float64}, 
-                           q0::Int64, 
-                           τ0::Int64,
-                           α::Float64,
-                           β_active)::Vector{Float64} 
+function glmnet_simul_cvts(y_temp, x_temp, 
+                           q0, τ0,
+                           α, β_active)::Vector{Float64} 
 
   # Iterator for training samples to choose λ	and iterators for oos cv
     sample_train      = map(i -> 1:(q0 +  i), 0:(τ0 - 1)) 	
@@ -247,11 +239,8 @@ end
 # -------------------------------------------------------------------------	
 #                       Function for Adaptive Lasso
 # -------------------------------------------------------------------------	
-function adaptive_lasso_cvts(y_temp::Vector{Float64}, 
-                             x_temp::Matrix{Float64}, 
-                             q0::Int64, 
-                             τ0::Int64,
-                             β_active)
+function adaptive_lasso_cvts(y_temp, x_temp, 
+                             q0, τ0, β_active)
 
   # Iterator for training and test samples 
     sample_train      = map(i -> 1:(q0 +  i), 0:(τ0 - 1)) 	
@@ -520,13 +509,12 @@ end
 # ----------------------------------------------------------------	
 #             Function for OOS forecasts with GLP approach
 # ----------------------------------------------------------------	
- function	GLP_oos(xtrain::Matrix{Float64}, xtest::Vector{Float64}, 
-                  ytrain::Vector{Float64}, ytest::Float64, 
-                  M::Int64, N::Int64, 
-                  abeta::Float64, bbeta::Float64, 
-                  Abeta::Float64, Bbeta::Float64,
-                  iter::Int64,
-                  β_active::Vector{Int64}) 
+ function	GLP_oos(xtrain, xtest, 
+                  ytrain, ytest, 
+                  M, N, 
+                  abeta, bbeta, 
+                  Abeta, Bbeta,
+                  iter, β_active) 
 
   # Set seed for reproducibility 
     Random.seed!(iter)
@@ -581,10 +569,8 @@ end
 	"""
 
  # Start function 
-  function bkm_predict(xy_data::Matrix{Float64}, 
-                      train_seq::Vector{Int64},
-                      obs_test::Int64,
-                      β_active)    
+  function bkm_predict(xy_data, train_seq,
+                      obs_test, β_active)    
 
     @rput xy_data train_seq obs_test 
 

@@ -6,8 +6,8 @@
   include("data_path.jl")
 
 # Simulation parameter
-  ncores   = 1          # Number of cores (for workers) 	
-  N    	   = Int64(1e3)  # Number of Monte Carlo iterations 
+  ncores   = 10          # Number of cores (for workers) 	
+  N    	   = 50 # Int64(1e3)  # Number of Monte Carlo iterations 
   dataset  = 1           # 0 = Financial data, 1 = Macroeconomic data (no lags)
   err_type = 1           # 0 = normal errors,  1 = t-distributed errors 
   diag_cov = 0           # Use diagonal covariance matrix?
@@ -16,7 +16,7 @@
 
 # Set parameters for GLP code (N_glp = burnin sample)
    N_glp 	= Int64(1e3)	
-   M_glp	= Int64(1e3) + N_glp
+   M_glp	= Int64(10e3) + N_glp
 
 # Run script to load packages and prepare data (run only once (!))
   include("PrepareData_2.jl")
@@ -42,7 +42,8 @@ for ii = 1:length(nz_β)
                                        err_type, ν, (kk + ii)), 1:N)                          																 
 
   # Merge simulated data and active predictors                                          
-    xydata_βact     = [xysim_data β_active]       
+    xydata_βact     = [xysim_data β_active]   
+    xydata_βact     = map(x -> SharedArray(x), xydata_βact)
                                           
 # #------------------------------------- Forecast combinations ---------------------------------------#																							
 #    results_fc_all  = pmap(eachrow(xydata_βact)) do kk 
@@ -103,7 +104,7 @@ for ii = 1:length(nz_β)
 # GLP results
   results_glp_all  = pmap(eachrow(xydata_βact)) do kk 
 
-                      GLP_oos(kk[1][1:(end - 1), 2:end], kk[1][end, 2:end], 
+                   @views GLP_oos(kk[1][1:(end - 1), 2:end], kk[1][end, 2:end], 
                               kk[1][1:(end - 1), 1], kk[1][end, 1],
                               M_glp, N_glp, abeta, bbeta, Abeta, Bbeta, 
                               Int64(floor(abs(sum(kk[1])))),
@@ -130,28 +131,28 @@ for ii = 1:length(nz_β)
   # Show progress
     @info string("ω = ", ω[ii], "; ", "nz_β = ", nz_β[ii])
 
-  # Relaunch workers
-  rmprocs(workers())
-  if nprocs() == 1 
-    addprocs(ncores - 1)
-    #addprocs(SlurmManager())
-    @everywhere begin
-      using Pkg; Pkg.activate(".")  
-      using Random
-      using StatsBase
-      using LinearAlgebra
-      using Distributions
-      using GLMNet
-      using RCall
-      using Lasso  
-      BLAS.set_num_threads(1)
-      include("GLP_SpikeSlab.jl")
-      include("Functions.jl")
-    end
-end
-include("Compile_functions.jl")
+#   # Relaunch workers
+#   rmprocs(workers())
+#   if nprocs() == 1 
+#     addprocs(ncores - 1)
+#     #addprocs(SlurmManager())
+#     @everywhere begin
+#       using Pkg; Pkg.activate(".")  
+#       using Random
+#       using StatsBase
+#       using LinearAlgebra
+#       using Distributions
+#       using GLMNet
+#       using RCall
+#       using Lasso  
+#       BLAS.set_num_threads(1)
+#       include("GLP_SpikeSlab.jl")
+#       include("Functions.jl")
+#     end
+# end
+# include("Compile_functions.jl")
 
-end
+ end
 
 results_all = [#fccomb_flex_nr; 
                bss_nr; 
