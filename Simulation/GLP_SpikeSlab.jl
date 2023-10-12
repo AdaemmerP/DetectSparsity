@@ -5,7 +5,7 @@ function GLP_SpikeSlab(y,
                        bbeta, 
                        Abeta, 
                        Bbeta, 
-                       M)         
+                       M::Int64)         
 
 #-----------------------------------------------------------------------------------------------------------------------#
 # Code by Philipp Adämmer & Rainer Schüssler

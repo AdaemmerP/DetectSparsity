@@ -11,7 +11,7 @@
   dataset  = 1           # 0 = Financial data, 1 = Macroeconomic data (no lags)
   err_type = 1           # 0 = normal errors,  1 = t-distributed errors 
   diag_cov = 0           # Use diagonal covariance matrix?
-  q0       = Int64(340)  # Training length 
+  q0       = Int64(140)  # Training length 
   τ0       = Int64(60)   # Length for cross validation
 
 # Set parameters for GLP code (N_glp = burnin sample)
@@ -43,7 +43,7 @@ for ii = 1:length(nz_β)
 
   # Merge simulated data and active predictors                                          
     xydata_βact     = [xysim_data β_active]   
-    xydata_βact     = map(x -> SharedArray(x), xydata_βact)
+    #xydata_βact     = map(x -> SharedArray(x), xydata_βact)
                                           
 # #------------------------------------- Forecast combinations ---------------------------------------#																							
 #    results_fc_all  = pmap(eachrow(xydata_βact)) do kk 
@@ -66,7 +66,7 @@ for ii = 1:length(nz_β)
 # Results for weak predictors
   results_glmnet = pmap(αN_comb) do kk
 
-                  glmnet_simul_cvts(xysim_data[kk[1]][:, 1], 
+             @views glmnet_simul_cvts(xysim_data[kk[1]][:, 1], 
                                     xysim_data[kk[1]][:, 2:end], 
                                     q0, 
                                     τ0, 
@@ -87,7 +87,7 @@ for ii = 1:length(nz_β)
 # Results for relaxed Lasso                                                      
   results_relax = pmap(eachrow(xydata_βact)) do kk
 
-                glmnet_relaxed_cvts(kk[1][:, 1], 
+          @views glmnet_relaxed_cvts(kk[1][:, 1], 
                                     kk[1][:, 2:end], 
                                     q0, τ0, 1.0, ζ,
                                     kk[2])
@@ -104,7 +104,7 @@ for ii = 1:length(nz_β)
 # GLP results
   results_glp_all  = pmap(eachrow(xydata_βact)) do kk 
 
-                   @views GLP_oos(kk[1][1:(end - 1), 2:end], kk[1][end, 2:end], 
+                @views GLP_oos(kk[1][1:(end - 1), 2:end], kk[1][end, 2:end], 
                               kk[1][1:(end - 1), 1], kk[1][end, 1],
                               M_glp, N_glp, abeta, bbeta, Abeta, Bbeta, 
                               Int64(floor(abs(sum(kk[1])))),
