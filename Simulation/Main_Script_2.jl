@@ -43,7 +43,6 @@ for ii = 1:length(nz_β)
 
   # Merge simulated data and active predictors                                          
     xydata_βact     = [xysim_data β_active]   
-    #xydata_βact     = map(x -> SharedArray(x), xydata_βact)
                                           
 # #------------------------------------- Forecast combinations ---------------------------------------#																							
 #    results_fc_all  = pmap(eachrow(xydata_βact)) do kk 
