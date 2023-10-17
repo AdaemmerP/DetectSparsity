@@ -73,8 +73,8 @@ for jj = 1:length(ω)
     fccomb_flex_nr[ii, jj]  = @views round(fccomb_means[3], digits = 4)
 
   # Save results for shrunk results
-    fccomb_flex_mse_shrunk[ii, jj] = @views 1 - fccomb_means[4]/MSE_hmean
-    fccomb_ew_mse_shrunk[ii, jj]   = @views 1 - fccomb_means[5]/MSE_hmean
+    #fccomb_flex_mse_shrunk[ii, jj] = @views 1 - fccomb_means[4]/MSE_hmean
+    #fccomb_ew_mse_shrunk[ii, jj]   = @views 1 - fccomb_means[5]/MSE_hmean
 
   # Compute true positive rate
     fccomb_tp[ii, jj] = fccomb_means[6]
@@ -98,14 +98,14 @@ for jj = 1:length(ω)
 # Ridge results	
   # Unshrunk results                  
     ridge_mse[ii, jj]         = @views 1 - mean(first.(results_glmnet[:, 1]))/MSE_hmean
-    ridge_mse_shrunk[ii, jj]  = @views 1 - mean(getindex.(results_glmnet[:, 1], 2))/MSE_hmean
+    #ridge_mse_shrunk[ii, jj]  = @views 1 - mean(getindex.(results_glmnet[:, 1], 2))/MSE_hmean
 
     enet_mse[ii, jj]         = @views 1 - mean(first.(results_glmnet[:, 2]))/MSE_hmean
-    enet_mse_shrunk[ii, jj]  = @views 1 - mean(getindex.(results_glmnet[:, 2], 2))/MSE_hmean
+    #enet_mse_shrunk[ii, jj]  = @views 1 - mean(getindex.(results_glmnet[:, 2], 2))/MSE_hmean
 
   # Unshrunk results   	
     lasso_mse[ii,      jj]	 = @views 1 - mean(first.(results_glmnet[:, 3]))/MSE_hmean
-    lasso_mse_shrunk[ii, jj] = @views 1 - mean(getindex.(results_glmnet[:, 3], 2))/MSE_hmean
+    #lasso_mse_shrunk[ii, jj] = @views 1 - mean(getindex.(results_glmnet[:, 3], 2))/MSE_hmean
 
   # Avg. number of included predictors 
     enet_nr[ii,  jj]   = @views mean(getindex.(results_glmnet[:, 2], 3))
@@ -130,7 +130,7 @@ for jj = 1:length(ω)
   lasso_relax_mse[ii, jj]	 = @views 1 - mean(getindex.(results_relax, 1))/MSE_hmean
   lasso_relax_nr[ii, jj]   = @views mean(getindex.(results_relax, 3))
 
-  lasso_relax_mse_shrunk[ii, jj] = @views 1 - mean(getindex.(results_relax, 2))/MSE_hmean
+  #lasso_relax_mse_shrunk[ii, jj] = @views 1 - mean(getindex.(results_relax, 2))/MSE_hmean
   lasso_relax_tp[ii, jj] = mean(getindex.(results_relax, 5))
 
 
@@ -148,7 +148,7 @@ for jj = 1:length(ω)
   lasso_adapt_mse[ii, jj]	= @views 1 - mean(getindex.(results_adlasso, 1))/MSE_hmean
   lasso_adapt_nr[ii, jj]  = @views mean(getindex.(results_adlasso, 3))
 
-  lasso_adapt_mse_shrunk[ii, jj] = @views 1 - mean(getindex.(results_adlasso, 2))/MSE_hmean
+  #lasso_adapt_mse_shrunk[ii, jj] = @views 1 - mean(getindex.(results_adlasso, 2))/MSE_hmean
   lasso_adapt_tp[ii, jj]         = mean(getindex.(results_adlasso, 4))
 
 #--------------------------------------------- GLP -----------------------------------------------#
@@ -166,7 +166,7 @@ for jj = 1:length(ω)
    
 # Save results
   glp_mse[ii, jj]        = 1 - @views mean(first.(results_glp_all))/MSE_hmean
-  glp_mse_shrunk[ii, jj] = 1 - @views mean(getindex.(results_glp_all, 2))/MSE_hmean
+  #glp_mse_shrunk[ii, jj] = 1 - @views mean(getindex.(results_glp_all, 2))/MSE_hmean
   glp_nr[ii, jj]         = @views round(mean(getindex.(results_glp_all, 3)), digits = 4)
   glp_tp[ii, jj]         = mean(getindex.(results_glp_all, 4))
 
@@ -233,16 +233,16 @@ end
   glp_mse          = hcat(repeat([string("Bayesian FSS")],      length(nz_β)), glp_mse)
   ridge_mse        = hcat(repeat([string("Ridge")],             length(nz_β)), ridge_mse)
 
-# Add row names (MSE shrunk) 
-  fccomb_flex_mse_shrunk = hcat(fccomb_flex_mse[:, 1],  fccomb_flex_mse_shrunk)
-  fccomb_ew_mse_shrunk   = hcat(fccomb_ew_mse[:, 1],    fccomb_ew_mse_shrunk)
-  bss_mse_shrunk         = hcat(bss_mse[:, 1],          bss_mse_shrunk)
-  lasso_mse_shrunk       = hcat(lasso_mse[:, 1],        lasso_mse_shrunk) 
-  lasso_relax_mse_shrunk = hcat(lasso_relax_mse[:, 1],  lasso_relax_mse_shrunk)
-  lasso_adapt_mse_shrunk = hcat(lasso_adapt_mse[:, 1],  lasso_adapt_mse_shrunk)
-  enet_mse_shrunk        = hcat(enet_mse[:, 1],         enet_mse_shrunk)
-  glp_mse_shrunk         = hcat(glp_mse[:, 1],          glp_mse_shrunk)                            
-  ridge_mse_shrunk       = hcat(ridge_mse[:, 1],        ridge_mse_shrunk)			
+# # Add row names (MSE shrunk) 
+#   fccomb_flex_mse_shrunk = hcat(fccomb_flex_mse[:, 1],  fccomb_flex_mse_shrunk)
+#   fccomb_ew_mse_shrunk   = hcat(fccomb_ew_mse[:, 1],    fccomb_ew_mse_shrunk)
+#   bss_mse_shrunk         = hcat(bss_mse[:, 1],          bss_mse_shrunk)
+#   lasso_mse_shrunk       = hcat(lasso_mse[:, 1],        lasso_mse_shrunk) 
+#   lasso_relax_mse_shrunk = hcat(lasso_relax_mse[:, 1],  lasso_relax_mse_shrunk)
+#   lasso_adapt_mse_shrunk = hcat(lasso_adapt_mse[:, 1],  lasso_adapt_mse_shrunk)
+#   enet_mse_shrunk        = hcat(enet_mse[:, 1],         enet_mse_shrunk)
+#   glp_mse_shrunk         = hcat(glp_mse[:, 1],          glp_mse_shrunk)                            
+#   ridge_mse_shrunk       = hcat(ridge_mse[:, 1],        ridge_mse_shrunk)			
   
 # Add row names (Average number of predictors) 
   fccomb_flex_nr = hcat(fccomb_flex_mse[:, 1],  fccomb_flex_nr)
@@ -281,17 +281,17 @@ end
                           zero_vec,															
                           ) 
 
-    global mat_shrunk_mse = vcat(mat_shrunk_mse,
-                                reshape(fccomb_flex_mse_shrunk[ii,  :], 1, :),
-                                reshape(fccomb_ew_mse_shrunk[ii,  :], 1, :),
-                                reshape(bss_mse_shrunk[ii,  :], 1, :),
-                                reshape(lasso_relax_mse_shrunk[ii,  :], 1, :),
-                                reshape(lasso_adapt_mse_shrunk[ii,  :], 1, :),
-                                reshape(lasso_mse_shrunk[ii,  :], 1, :),
-                                reshape(enet_mse_shrunk[ii,  :], 1, :),
-                                reshape(glp_mse_shrunk[ii,  :], 1, :),
-                                reshape(ridge_mse_shrunk[ii,  :], 1, :),                              													
-                                 zero_vec) 
+    # global mat_shrunk_mse = vcat(mat_shrunk_mse,
+    #                             reshape(fccomb_flex_mse_shrunk[ii,  :], 1, :),
+    #                             reshape(fccomb_ew_mse_shrunk[ii,  :], 1, :),
+    #                             reshape(bss_mse_shrunk[ii,  :], 1, :),
+    #                             reshape(lasso_relax_mse_shrunk[ii,  :], 1, :),
+    #                             reshape(lasso_adapt_mse_shrunk[ii,  :], 1, :),
+    #                             reshape(lasso_mse_shrunk[ii,  :], 1, :),
+    #                             reshape(enet_mse_shrunk[ii,  :], 1, :),
+    #                             reshape(glp_mse_shrunk[ii,  :], 1, :),
+    #                             reshape(ridge_mse_shrunk[ii,  :], 1, :),                              													
+    #                              zero_vec) 
   
   # Fill matrices with number of chosen predictors 									
     global mat_nr = vcat(mat_nr,
@@ -318,7 +318,7 @@ end
 
 # Round slice matrices
   mat_mse        = @views mat_mse[2:end, :]
-  mat_shrunk_mse = @views mat_shrunk_mse[2:end, :]
+  #mat_shrunk_mse = @views mat_shrunk_mse[2:end, :]
   mat_nr         = @views mat_nr[2:end, :]
   mat_tp         = @views mat_tp[2:end, :]
 
