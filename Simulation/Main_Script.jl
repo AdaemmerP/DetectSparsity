@@ -6,17 +6,17 @@ This is the main script of the simulation
   include("data_path.jl")
 
 # Simulation parameter
-  ncores   = 3           # Number of cores (for workers) 	
-  N    	   = Int64(1e3)  # Number of Monte Carlo iterations 
-  dataset  = 0           # 0 = Financial data, 1 = Macroeconomic data (no lags), 2 = Macroeconomic data (including 4 lags)
+  ncores   = 5           # Number of cores (for workers) 	
+  N    	   = Int64(10)  # Number of Monte Carlo iterations 
+  dataset  = 1           # 0 = Financial data, 1 = Macroeconomic data (no lags), 2 = Macroeconomic data (including 4 lags)
   err_type = 1           # 0 = normal errors,  1 = t-distributed errors 
   diag_cov = false       # Use diagonal covariance matrix?
   q0       = Int64(140)  
   τ0       = Int64(60)
 
 # Set parameters for GLP code (N_glp = burnin sample)
-  N_glp = Int64(1e3)	
-  M_glp	= Int64(10e3) + N_glp
+  N_glp = Int64(10)	
+  M_glp	= Int64(10) + N_glp
 
 # Run script to load packages and prepare data (run only once (!))
   include("PrepareData.jl")
@@ -187,27 +187,25 @@ for jj = 1:length(ω)
   # Show progress
     @info string("ω = ", ω[jj], "; ", "nz_β = ", nz_β[ii])
     
-  # # Check whether to reset workers for memory
-  #   if mod(ii, 3) == 0
-  #     rmprocs(workers())         # Close workers to free space
-  #     # Restart workers
-  #     addprocs(ncores)
-  #       @everywhere begin
-  #         using Pkg; Pkg.activate(".")  
-  #         using Random
-  #         using StatsBase
-  #         using LinearAlgebra
-  #         using Distributions
-  #         using GLMNet
-  #         using RCall
-  #         using Lasso  
-  #         BLAS.set_num_threads(1)
-  #         include("GLP_SpikeSlab.jl")
-  #         include("Functions.jl")
-  #       end
-  #     include("Compile_functions.jl") # Pre-compile functions
-  #  end                    
-
+  # Check whether to reset workers for memory
+    if mod(jj, 3) == 0 && mod(ii, 3) == 0
+      rmprocs(workers())         # Close workers to free space
+        addprocs(ncores - 1)
+        @everywhere begin
+          using Pkg; Pkg.activate(".")  
+          using Random
+          using StatsBase
+          using LinearAlgebra
+          using Distributions
+          using GLMNet
+          using RCall
+          using Lasso  
+          BLAS.set_num_threads(1)
+          include("GLP_SpikeSlab.jl")
+          include("Functions.jl")          
+        end
+        include("Compile_functions.jl") # Pre-compile functions
+    end            
   end
 end
 
@@ -217,14 +215,14 @@ end
 
 # Pre-allocate matrices to store results 
   mat_mse  	       = zeros(1, length(ω) + 1)
-  mat_shrunk_mse	 = zeros(1, length(ω) + 1)
+  #mat_shrunk_mse	 = zeros(1, length(ω) + 1)
   mat_nr           = zeros(1, length(ω) + 1)
   mat_tp           = zeros(1, length(ω) + 1)
   zero_vec         = zeros(1, length(ω)+ 1)
 
 # Add row names (MSE unshrunk) 
-  fccomb_flex_mse  = hcat(repeat([string("FC\$^{\\text{Flex}}\$")], length(nz_β)), fccomb_flex_mse)
-  fccomb_ew_mse    = hcat(repeat([string("FC\$^{\\text{EW}}\$")], length(nz_β)), fccomb_ew_mse)
+  #fccomb_flex_mse  = hcat(repeat([string("FC\$^{\\text{Flex}}\$")], length(nz_β)), fccomb_flex_mse)
+  #fccomb_ew_mse    = hcat(repeat([string("FC\$^{\\text{EW}}\$")], length(nz_β)), fccomb_ew_mse)
   bss_mse          = hcat(repeat([string("Best Subset")],       length(nz_β)), bss_mse)
   lasso_mse        = hcat(repeat([string("Lasso")],             length(nz_β)), lasso_mse)
   lasso_relax_mse  = hcat(repeat([string("Relaxed Lasso")],     length(nz_β)), lasso_relax_mse)
@@ -245,7 +243,7 @@ end
 #   ridge_mse_shrunk       = hcat(ridge_mse[:, 1],        ridge_mse_shrunk)			
   
 # Add row names (Average number of predictors) 
-  fccomb_flex_nr = hcat(fccomb_flex_mse[:, 1],  fccomb_flex_nr)
+  #fccomb_flex_nr = hcat(fccomb_flex_mse[:, 1],  fccomb_flex_nr)
   bss_nr         = hcat(bss_mse[:, 1],          bss_nr)
   lasso_relax_nr = hcat(lasso_relax_mse[:, 1],  lasso_relax_nr)
   lasso_adapt_nr = hcat(lasso_adapt_mse[:, 1],  lasso_adapt_nr)
@@ -254,7 +252,7 @@ end
   glp_nr         = hcat(glp_mse[:, 1],          glp_nr)                            
   	
 # Add row names (True positives) 
-  fccomb_tp        = hcat(fccomb_flex_mse[:, 1], fccomb_tp)
+  #fccomb_tp        = hcat(fccomb_flex_mse[:, 1], fccomb_tp)
   bss_tp           = hcat(bss_mse[:, 1],         bss_tp)
   lasso_relax_tp   = hcat(lasso_relax_mse[:, 1], lasso_relax_tp)
   lasso_adapt_tp   = hcat(lasso_adapt_mse[:, 1], lasso_adapt_tp)
@@ -269,8 +267,8 @@ end
 
     # Fill matrices with MSE
     global mat_mse = vcat(mat_mse,
-                          reshape(fccomb_flex_mse[ii,  :], 1, :),
-                          reshape(fccomb_ew_mse[ii,  :], 1, :),
+                          #reshape(fccomb_flex_mse[ii,  :], 1, :),
+                          #reshape(fccomb_ew_mse[ii,  :], 1, :),
                           reshape(bss_mse[ii,  :], 1, :),
                           reshape(lasso_relax_mse[ii,  :], 1, :),
                           reshape(lasso_adapt_mse[ii,  :], 1, :),
@@ -295,7 +293,7 @@ end
   
   # Fill matrices with number of chosen predictors 									
     global mat_nr = vcat(mat_nr,
-                         reshape(fccomb_flex_nr[ii,  :], 1, :),                    
+                         #reshape(fccomb_flex_nr[ii,  :], 1, :),                    
                          reshape(bss_nr[ii,  :], 1, :),
                          reshape(lasso_relax_nr[ii,  :], 1, :),
                          reshape(lasso_adapt_nr[ii,  :], 1, :),
@@ -305,7 +303,7 @@ end
                          zero_vec) 
 
     global mat_tp = vcat(mat_tp,
-                         reshape(fccomb_tp[ii,  :], 1, :),                    
+                         #reshape(fccomb_tp[ii,  :], 1, :),                    
                          reshape(bss_tp[ii,  :], 1, :),
                          reshape(lasso_relax_tp[ii,  :], 1, :),
                          reshape(lasso_adapt_tp[ii,  :], 1, :),
@@ -317,20 +315,21 @@ end
   end
 
 # Round slice matrices
-  mat_mse        = @views mat_mse[2:end, :]
+  mat_mse        = mat_mse[2:end, :]
   #mat_shrunk_mse = @views mat_shrunk_mse[2:end, :]
-  mat_nr         = @views mat_nr[2:end, :]
-  mat_tp         = @views mat_tp[2:end, :]
+  mat_nr         = mat_nr[2:end, :]
+  mat_tp         = mat_tp[2:end, :]
 
 # Merge matrices 
-  mat_merge_mse  = @views vcat(mat_mse, mat_shrunk_mse)  
-  mat_merge_nrtp = @views vcat(mat_nr, mat_tp)  
+  #mat_merge_mse  = mat_mse # @views vcat(mat_mse, mat_shrunk_mse)  
+  #mat_merge_nrtp = @views vcat(mat_nr, mat_tp)  
  
 # Convert matrices to R objects	
   omega = ω
   @rput omega
-  @rput mat_merge_mse   
-  @rput mat_merge_nrtp         
+  @rput mat_mse   
+  @rput mat_nr
+  @rput mat_tp       
   @rput err_type
 
 # Convert Matrix to latex table (with R)
@@ -338,25 +337,31 @@ end
   library(xtable)
 
   # MSE-Matrix for weak predictors
-    table_mse					  <- mat_merge_mse
+    table_mse					  <- mat_mse
     colnames(table_mse) <- c("", paste("omega = ", omega)) 
     table_mse           <- xtable(table_mse, digits = 4)
-     
-    
+         
   # Number of variables for weak predictors
-    table_nr 				   <- mat_merge_nrtp
-    colnames(table_mse) <- c("", paste("omega = ", omega)) 
+    table_nr 				   <- mat_nr
+    colnames(table_nr) <- c("", paste("omega = ", omega)) 
     table_nr           <- xtable(table_nr, digits = 4)
+
+  # Number of variables for weak predictors
+    table_tp 				   <- mat_tp
+    colnames(table_tp) <- c("", paste("omega = ", omega)) 
+    table_tp           <- xtable(table_tp, digits = 4)
   
   # Save all tables in list
-    all_tables = list((table_mse), 
-                      (table_nr))
-    print(all_tables, sanitize.text.function = function(x) x, 
-                      include.rownames = FALSE, 
-                      booktabs = TRUE)                      
+    all_tables = list(table_mse, 
+                      table_nr,
+                      table_tp)
+    # print(all_tables, sanitize.text.function = function(x) x, 
+    #                   include.rownames = FALSE, 
+    #                   booktabs = TRUE)                      
 
-    dstring <- if(err_type == 0) "_DN.RData" else "_DT.RData"
-    save(all_tables, file = paste("SimTables_finance_18_03_23", dstring, sep = ""))
+    # dstring <- if(err_type == 0) "_DN.RData" else "_DT.RData"
+    # save(all_tables, file = paste("SimTables_macro", dstring, sep = ""))
+    all_tables
   """
 
  # Close workers

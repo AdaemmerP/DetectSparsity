@@ -544,7 +544,7 @@ end
     yhat_shrunk   = (yhat + mean(ytrain))/2
 
   # Average inclusion of preditors per Gibbs iteration
-    z_run::Float64 = mean(map(i -> sum(i), eachcol(results_temp[2][:, (N + 1):end])))
+    z_run::Float64 = mean(modes(map(i -> sum(i), eachcol(results_temp[2][:, (N + 1):end]))))
 
   # Get active predictors and compute true positive rate
     pred_pick::Vector{Vector{Int64}} = map(i -> collect(1:length(βhat))[Bool.(i)], eachcol(results_temp[2][:, (N + 1):end]))  
