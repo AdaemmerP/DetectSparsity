@@ -49,35 +49,35 @@ for jj = 1:length(ω)
   # Merge simulated data and active predictors                                          
     xydata_βact     = [xysim_data β_active]                                             
 #------------------------------------- Forecast combinations ---------------------------------------#																							
-   results_fc_all  = pmap(eachrow(xydata_βact)) do kk 
+  #  results_fc_all  = pmap(eachrow(xydata_βact)) do kk 
 
-                          fcomb_simul(kk[1], 
-                                      sample_train, 
-                                      model_comb, 
-                                      models_univ_time, 
-                                      comb_t, 
-                                      kk[2])
+  #                         fcomb_simul(kk[1], 
+  #                                     sample_train, 
+  #                                     model_comb, 
+  #                                     models_univ_time, 
+  #                                     comb_t, 
+  #                                     kk[2])
 
-                      end
+  #                     end
   
                              
-  # Convert output to Matrix	
-    results_fc_all  = reduce(hcat, results_fc_all)
+  # # Convert output to Matrix	
+  #   results_fc_all  = reduce(hcat, results_fc_all)
    
-  # Extract results
-    fccomb_means = @views mean(results_fc_all, 	dims = 2)
+  # # Extract results
+  #   fccomb_means = @views mean(results_fc_all, 	dims = 2)
 
-  # Save results for weak predictors	
-    fccomb_flex_mse[ii, jj] = @views 1 - fccomb_means[1]/MSE_hmean
-    fccomb_ew_mse[ii, jj]   = @views 1 - fccomb_means[2]/MSE_hmean
-    fccomb_flex_nr[ii, jj]  = @views round(fccomb_means[3], digits = 4)
+  # # Save results for weak predictors	
+  #   fccomb_flex_mse[ii, jj] = @views 1 - fccomb_means[1]/MSE_hmean
+  #   fccomb_ew_mse[ii, jj]   = @views 1 - fccomb_means[2]/MSE_hmean
+  #   fccomb_flex_nr[ii, jj]  = @views round(fccomb_means[3], digits = 4)
 
-  # Save results for shrunk results
-    #fccomb_flex_mse_shrunk[ii, jj] = @views 1 - fccomb_means[4]/MSE_hmean
-    #fccomb_ew_mse_shrunk[ii, jj]   = @views 1 - fccomb_means[5]/MSE_hmean
+  # # Save results for shrunk results
+  #   #fccomb_flex_mse_shrunk[ii, jj] = @views 1 - fccomb_means[4]/MSE_hmean
+  #   #fccomb_ew_mse_shrunk[ii, jj]   = @views 1 - fccomb_means[5]/MSE_hmean
 
-  # Compute true positive rate
-    fccomb_tp[ii, jj] = fccomb_means[6]
+  # # Compute true positive rate
+  #   fccomb_tp[ii, jj] = fccomb_means[6]
 
 #------------------------------------- Glmnet  ----------------------------------------------#	
 # Make all combinations of α and N
