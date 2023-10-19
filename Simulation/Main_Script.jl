@@ -135,21 +135,21 @@ for jj = 1:length(ω)
 
 
 #------------------------------------- Adaptive Lasso  ----------------------------------------------#	
- # Results for relaxed Lasso                                                      
-   results_adlasso = pmap(eachrow(xydata_βact)) do kk
+#  # Results for relaxed Lasso                                                      
+#    results_adlasso = pmap(eachrow(xydata_βact)) do kk
 
-              adaptive_lasso_cvts(kk[1][:, 1], 
-                                  kk[1][:, 2:end], 
-                                  q0, τ0,
-                                  kk[2])
+#               adaptive_lasso_cvts(kk[1][:, 1], 
+#                                   kk[1][:, 2:end], 
+#                                   q0, τ0,
+#                                   kk[2])
 
-        end
+#         end
 
-  lasso_adapt_mse[ii, jj]	= @views 1 - mean(getindex.(results_adlasso, 1))/MSE_hmean
-  lasso_adapt_nr[ii, jj]  = @views mean(getindex.(results_adlasso, 3))
+#   lasso_adapt_mse[ii, jj]	= @views 1 - mean(getindex.(results_adlasso, 1))/MSE_hmean
+#   lasso_adapt_nr[ii, jj]  = @views mean(getindex.(results_adlasso, 3))
 
-  #lasso_adapt_mse_shrunk[ii, jj] = @views 1 - mean(getindex.(results_adlasso, 2))/MSE_hmean
-  lasso_adapt_tp[ii, jj]         = mean(getindex.(results_adlasso, 4))
+#   #lasso_adapt_mse_shrunk[ii, jj] = @views 1 - mean(getindex.(results_adlasso, 2))/MSE_hmean
+#   lasso_adapt_tp[ii, jj]         = mean(getindex.(results_adlasso, 4))
 
 #--------------------------------------------- GLP -----------------------------------------------#
 
